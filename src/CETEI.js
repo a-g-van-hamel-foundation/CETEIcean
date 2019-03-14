@@ -676,6 +676,9 @@ class CETEI {
                 .replace(/&Oacute;/, "Ö")
                 .replace(/&uacute;/, "ú")
                 .replace(/&Uacute;/, "Ú")
+
+                .replace(/&auml;/, "ä")
+                .replace(/&Auml;/, "Ä")
         
                 .replace(/&mdash;/, "—")
                 .replace(/&ndash;/, "–");
