@@ -654,10 +654,31 @@ class CETEI {
                 .replace(/&quot;/, "\"")
                 .replace(/&apos;/, "'")
                 .replace(/&amp;/, "&")
+        /* additional - VH */
+                .replace(/&amacr;/, "ā")
+                .replace(/&Amacr;/, "Ā")
+                .replace(/&emacr;/, "ē")
+                .replace(/&Emacr;/, "Ē")
+                .replace(/&imacr;/, "ī")
+                .replace(/&Imacr;/, "Ī")
                 .replace(/&omacr;/, "ō")
                 .replace(/&Omacr;/, "Ō")
-                .replace(/&amacr;/, "ā")
-                .replace(/&Amacr;/, "Ā");
+                .replace(/&umacr;/, "ū")
+                .replace(/&Umacr;/, "Ū")
+        
+                .replace(/&aacute;/, "á")
+                .replace(/&Aacute;/, "Á")
+                .replace(/&eacute;/, "é")
+                .replace(/&Eacute;/, "É")
+                .replace(/&iacute;/, "í")
+                .replace(/&Iacute;/, "Í")
+                .replace(/&oacute;/, "ó")
+                .replace(/&Oacute;/, "Ö")
+                .replace(/&uacute;/, "ú")
+                .replace(/&Uacute;/, "Ú")
+        
+                .replace(/&mdash;/, "—")
+                .replace(/&ndash;/, "–");
     }
 
     static savePosition() {
