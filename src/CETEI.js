@@ -653,7 +653,11 @@ class CETEI {
       return str.replace(/&gt;/, ">")
                 .replace(/&quot;/, "\"")
                 .replace(/&apos;/, "'")
-                .replace(/&amp;/, "&");
+                .replace(/&amp;/, "&")
+                .replace(/&omacr;/, "ō")
+                .replace(/&Omacr;/, "Ō")
+                .replace(/&amacr;/, "ā")
+                .replace(/&Amacr;/, "Ā");
     }
 
     static savePosition() {
