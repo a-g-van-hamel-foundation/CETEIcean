@@ -19,6 +19,11 @@
     text-align:left;
 }
 
+/* Convenient for multilingualism */
+[lang="lat"] {
+    color:#564856;
+}
+
 /* Choice elements */
 tei-choice tei-abbr + tei-expan:before,
 tei-choice tei-expan + tei-abbr:before,
@@ -1827,7 +1832,7 @@ tei-zone {
   /* Empty Rule Set */
 }
 
-/* styles for html shell and html elements in TEI (e.g.,<a> and <img>) */
+/* styles for html shell and html elements in TEI (e.g.,<a> and <img>) 
 html > body {
   margin: 0;
   padding: 0;
@@ -1843,3 +1848,4 @@ html {
   background-color: white;
   color: #292929;
 }
+*/
