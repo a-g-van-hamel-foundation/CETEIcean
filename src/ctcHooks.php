@@ -1,9 +1,7 @@
 <?php
 
 use MediaWiki\MediaWikiServices;
-//use MediaWiki\ExtensionRegistry;
 use MediaWiki\OutputPage;
-//use MediaWiki\Parser;
 use MediaWiki\ParserOutput;
 use MediaWiki\PPFrame;
 use Ctc\Core\ctcRender;

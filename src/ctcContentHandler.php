@@ -6,12 +6,6 @@ use MediaWiki\Content\Html;
 use MediaWiki\Content\Renderer\ContentParseParams;
 use MediaWiki\Content\Transform\PreSaveTransformParams;
 use MediaWiki\Content\ValidationParams;
-//use MWException;
-//use ParserOutput;
-//use Status;
-//use StatusValue;
-//use MediaWiki\Content\CodeContentHandler;
-//use TextContentHandler;
 use Title;
 use Ctc\Core\ctcContent;
 

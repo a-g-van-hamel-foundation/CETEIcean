@@ -6,7 +6,6 @@ use MediaWiki\MainConfigNames;
 use MediaWiki\OutputPage;
 use MediaWiki\ParserOutput;
 use MediaWiki\PPFrame;
-//use MediaWiki\PPNode;
 use Ctc\Core\ctcXmlProc;
 use Ctc\Core\ctcTabWidget;
 
@@ -46,7 +45,6 @@ class ctcRender {
        'class'=>'cetei-source-xml
       '], $retrievedText ); //Source code to be shown in pre tags
     /* Because hidden comments could potentially be an issue to xml parse: */
-    //@todo change back to $retrievedText
 
     $sourceContent = preg_replace( '/<!--.*?-->/s', '', $newXmlStr );
 
