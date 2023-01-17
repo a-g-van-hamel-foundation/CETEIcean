@@ -1,0 +1,46 @@
+<!DOCTYPE TEI [
+<!ENTITY ampersir "⁊" >
+<!ENTITY ndash "–"><!ENTITY mdash "—">
+<!ENTITY AElig "Æ" ><!ENTITY aelig "æ" >
+<!ENTITY amacr "ā" ><!ENTITY Amacr "Ā" >
+<!ENTITY amacr "ā" ><!ENTITY Amacr "Ā" >
+<!ENTITY emacr "ē" ><!ENTITY Emacr "Ē" >
+<!ENTITY Imacr "Ī" ><!ENTITY imacr "ī" >
+<!ENTITY Omacr "Ō" ><!ENTITY omacr "ō" >
+<!ENTITY umacr "ū" ><!ENTITY Umacr "Ū" >
+<!ENTITY smacr "s̄" >
+<!ENTITY mmacr "m̄" >
+<!ENTITY rmacr "r" >
+<!ENTITY macr " " >
+<!ENTITY aacute "á" ><!ENTITY Aacute "Á" >
+<!ENTITY eacute "é" ><!ENTITY Eacute "É" >
+<!ENTITY iacute "í" ><!ENTITY Iacute "Í" >
+<!ENTITY oacute "ó" ><!ENTITY Oacute "Ó" >
+<!ENTITY uacute "ú" ><!ENTITY Uacute "Ú" >
+<!ENTITY Agrave "À" ><!ENTITY agrave "à" >
+<!ENTITY Egrave "È" ><!ENTITY egrave "è" >
+<!ENTITY Igrave "Ì" ><!ENTITY igrave "ì" >
+<!ENTITY Ograve "Ò" ><!ENTITY ograve "ò" >
+<!ENTITY Ugrave "Ù" ><!ENTITY ugrave "ù" >
+<!ENTITY auml "ä" ><!ENTITY Auml "Ä" >
+<!ENTITY euml "ë" ><!ENTITY Euml "Ë" >
+<!ENTITY iuml "ï" ><!ENTITY Iuml "Ï" >
+<!ENTITY ouml "ö" ><!ENTITY Ouml "Ö" >
+<!ENTITY uuml "ü" ><!ENTITY Uuml "Ü" >
+<!ENTITY Fdot "Fh" ><!ENTITY fdot "fh" >
+<!ENTITY Mdot "Mh" ><!ENTITY mdot "mh" >
+<!ENTITY Ndot "Ṅ" ><!ENTITY ndot "ṅ" >
+<!ENTITY Sdot "Ṡ" ><!ENTITY sdot "ṡ" >
+<!ENTITY eogon "ę" ><!ENTITY Eogon "Ę" >
+<!ENTITY Acaron "Ǎ"><!ENTITY acaron "ǎ">
+<!ENTITY Ccaron "Č"><!ENTITY ccaron "č">
+<!ENTITY Ecaron "Ě"><!ENTITY ecaron "ě" >
+<!ENTITY Gcaron "Ǧ"><!ENTITY gcaron "ǧ" >
+<!ENTITY Icaron "Ǐ"><!ENTITY icaron "ǐ" >
+<!ENTITY Ocaron "Ǒ"><!ENTITY ocaron "ǒ" >
+<!ENTITY Scaron "Š"><!ENTITY scaron "š" >
+<!ENTITY Ucaron "Ǔ"><!ENTITY ucaron "ǔ">
+
+<!ENTITY hellip "…">
+<!ENTITY CzzzzzFil "[Filíocht]"><!ENTITY CzzzzzPrós "[Prós]">
+]>

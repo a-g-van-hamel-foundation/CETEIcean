@@ -1,0 +1,58 @@
+<!DOCTYPE TEI [
+<!ENTITY ndash "–"><!ENTITY mdash "—">
+
+<!ENTITY amacr "&#x0101;" ><!ENTITY Amacr "&#x0100;" >
+<!ENTITY emacr "&#x0113;" ><!ENTITY Emacr "&#x0112;" >
+<!ENTITY Imacr "&#x012A;" ><!ENTITY imacr "&#x012B;" >
+<!ENTITY Omacr "&#x014C;" ><!ENTITY omacr "&#x014D;" >
+<!ENTITY umacr "&#x016B;" ><!ENTITY Umacr "&#x016A;" >
+<!ENTITY smacr "s̄" >
+<!ENTITY mmacr "m̄" >
+
+<!ENTITY aacute "&#x00E1;" ><!ENTITY Aacute "&#x00C1;" >
+<!ENTITY eacute "&#x00E9;" ><!ENTITY Eacute "&#x00C9;" >
+<!ENTITY iacute "&#x00ED;" ><!ENTITY Iacute "&#x00CD;" >
+<!ENTITY oacute "&#x00F3;" ><!ENTITY Oacute "&#x00D3;" >
+<!ENTITY uacute "&#x00FA;" ><!ENTITY Uacute "&#x00DA;" >
+
+<!ENTITY auml "&#x00E4;" ><!ENTITY Auml "&#x00C4;" >
+<!ENTITY euml "&#x00EB;" ><!ENTITY Euml "&#x00CB;" >
+<!ENTITY iuml "&#x00EF;" ><!ENTITY Iuml "&#x00CF;" >
+<!ENTITY ouml "&#x00F6;" ><!ENTITY Ouml "&#x00D6;" >
+<!ENTITY uuml "&#x00FC;" ><!ENTITY Uuml "&#x00DC;" >
+
+<!ENTITY rmacr "r" >
+<!ENTITY macr " " >
+<!ENTITY ampersir "⁊" >
+<!ENTITY ndot "ṅ" >
+<!ENTITY sdot "ṡ" >
+
+]>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader></teiHeader>
+<body>
+<text>
+<div type="section" n="1"><p n="1">
+	<seg n="1">Tri hollamain Chondacht .i. <persName>mac Liacc</persName> &ampersir; <persName>mac Coisi</persName> &ampersir; <persName>Fland mac Lonain</persName> .i. mac De &ampersir; mac duine &ampersir; mac deamain.</seg>
+	<seg n="2"><persName>Fland mac Lonain</persName>, mac deamain side ara geri &ampersir; ara duilgi, uair ni deachaid a tig riam <del>cen easba aire do denum</del> cen esba aíre do dénum and.</seg>
+<seg><persName>Mac Liac</persName> imorro mac duine ar febas a thigidis &ampersir; ara febus arai in duine fen.</seg>
+<seg><persName>Mac Cosi</persName> imorro mac De ar met a derci &ampersir; is bas ailithri ruc.</seg>
+</p></div>
+<div type="section" n="2"><p n="2">
+	<seg><persName>llrechtach</persName> imorro ainm timpanaich <persName>meic Liac</persName> &ampersir; timpanach <persName>meic Lonain</persName> roime he &ampersir; dobai ac <persName>mac Liac</persName> iar n-ec <persName>meic Lonain</persName>.</seg>
+	<seg>Dochuaid <persName>mac Liac</persName> do indsaigid <persName>Briain</persName> dia acallaim &ampersir; <persName>Illrechtach</persName> mailli fris.</seg>
+	<seg>IS amlaid notheighed co menic o <placeName>loch Riach</placeName> tar <placeName>Echtgi</placeName> fodeas co <placeName>Luimneach</placeName> ocus da puitric dec lais con a mbiad dingbala leo.</seg>
+	<seg>Uair is da radarc dec atat a n-<placeName>Echtgi</placeName> &ampersir; puitric noibead in cach radarc dibsin.</seg>
+  </p></div>
+<div type="section" n="3"><p n="3">
+	<seg>Feacht and tra dochuadar fodeas &ampersir; rosuidsedar i n-aroile cnuc inti .i. <placeName>ceann Crochain</placeName> &ampersir; adbert <persName>mac Liag</persName>:</seg>
+	<seg>Is imda cnoc &ampersir; loch &ampersir; dingna &ampersir; robad fis mor a fis uili.</seg>
+	<seg>Albert <persName>Ilrachtach</persName>: damad he <persName>mac Lonain</persName> nobeith sunn nobiad aici a fis dinds.eanchais cach inaid sund.</seg>
+	<seg>Adbert <persName>mac Liag</persName>: Gabair sut &ampersir; crochair he.</seg>
+	<seg>Rochunnig <persName>Ilrechtach</persName> dal co maidin &ampersir; tucad do can a chrochad, &ampersir; rothraisc an aidchi sin co toracht anum <persName>Floind meic Lonain</persName> dia chobair. o drechtadar madan moch iarnabarach, adchonncadar chucu <persName>mac Lonan</persName> &ampersir; adbert riu:</seg>
+	<seg>Leigid uaib in cimid &ampersir; indisfead duib seanchas cach dingna sunna isin nEchtgi.</seg>
+  <seg>Rosaerad amlaid sen in timpanach cen a chrochad ac <persName>mac Liag</persName> &ampersir; adbert <persName>mac Lonan</persName> and sin in duan-sa and.</seg>
+  </p></div>
+</text>
+</body>
+</TEI>
