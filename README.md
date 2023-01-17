@@ -122,7 +122,7 @@ Relative path to the DTD file containing character entity references. For securi
 ### `$wgCeteiAllowEntitySubstitution`
 Default: false (boolean). Whether entity substitution is allowed. See note on security below.
 
-### `#wgAllowUrl`
+### `#wgCeteiAllowUrl`
 Default: false (boolean). Whether the parser function when used with `url` should be allowed to retrieve the contents of a document from a public URL accessible to the server.
 
 ## Notes
