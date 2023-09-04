@@ -72,6 +72,7 @@ class ctcHooks {
     $functionCallback = [ 'Ctc\Core\ctcParserFunctions', 'runCeteiPF' ];
     $flags = \Parser::SFH_OBJECT_ARGS;
     $parser->setFunctionHook( $name, $functionCallback, $flags );
+
     return true;
   }
 

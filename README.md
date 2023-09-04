@@ -57,7 +57,7 @@ Instead of `doc`, you can also use the `url` parameter, which expects a full URL
 }}
 ```
 
-### Excerpts
+### Excerpts (XPath)
 When either `doc` or `url` is used without a further argument, `#cetei` will attempt to retrieve the full document. Alternatively, you can fetch one or multiple excerpts by running a simple XPath query: add your XPath expression to a second parameter called `sel`, which is short for selector. The namespace prefix registered for this is `ctc`.
 
 ```
@@ -73,6 +73,18 @@ Example. The following retrieves the paragraph (element `p`) where the attribute
 }}
 ```
 For reasons that are specific to MediaWiki, you cannot use the pipe character (`|`) as OR operator, but there is a simple workaround: write `{{!}}` instead.
+
+### Fragments between self-closing tags (new since 0.3)
+```
+{{#cetei:doc=...
+  |break1=pb---n---23
+  |break2=pb---n---24
+}}
+```
+In (TEI) XML, not all units are necessarily encoded through matching pairs of opening and closing tags. A new page or column may start with a self-closing tag which marks a new beginning, e.g. `<pb n="23" type="page" />"`, and may end with the one marking the next break (when there is none, you've probably reached the end of the document). XPath is not designed for this use case: such units are not part of DOM trees and probably impossible to align with them if the position of the self-closing tag is relatively free, e.g. within or after a paragraph. This experimental feature is intended to let you extract content between two self-closing tags; an attempt is then made to (semi-)repair the XML fragment by supplying the missing opening and closing tags; and a new version rendered as HTML is returned.
+
+- Use the `break1` and `break2` parameters to identify the first and final closing tags.
+- For each closing tag, use three consecutive hyphens to delimit the tag name, attribute and value, as in the example above.
 
 ## Special:CETEIcean
 The special page `Special:CETEIcean` contains basic information about the extension and lists pages in the `Cetei:` namespace.
@@ -147,3 +159,8 @@ These issues are currently addressed in the following way:
 
 ### Developer notes
 - Because this extension was written and tested with MW 1.35, which does not offer support for ES6 with ResourceLoader, the code in CETEIcean’s JS files has been transpiled to ES5 using [Babel js](https://babeljs.io) and a polyfill for custom elements is added as a dependency.
+
+## Version history
+- 0.3. Added an experimental feature to `#cetei` for breaking out a fragment between two self-closing tags, typically `pb` or `mls`/`milestone`, having the XML repaired and retrieving an HTML rendering. This is intended for documents in which the position of such tags is too problematic and unpredictable for XPath selection. Extended list of character entities.
+- 0.2. Pre-processing now in XSLT, with continued support for 'behaviors'.
+- 0.1. First release.

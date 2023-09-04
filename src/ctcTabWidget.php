@@ -9,17 +9,18 @@ class ctcTabWidget {
   function run (
     &$out,
     $pageTitle,
-    $ceteiInstanceDiv = '',
-    $docBtnStr,
-    $docPageStr = '',
-    $sourceCode,
-    $hasTeiHeader
+    string $ceteiInstanceDiv = '',
+    string $docBtnStr = '',
+    string $docPageStr = '',
+    string $sourceCode = '',
+    bool $hasTeiHeader = true
   ) {
 
     $ctcTabName1 = wfMessage( 'cetei-tabheader-1' )->parse(); //Text
     $ctcTabName2 = wfMessage( 'cetei-tabheader-2' )->parse(); //Doc
     $ctcTabName3 = wfMessage( 'cetei-tabheader-3' )->parse(); //Source
     $ctcTopRight = wfMessage( 'cetei-top-right-content' )->params( $pageTitle )->parse();
+    $ctcCreditsBottom = wfMessage( 'cetei-credits-bottom' )->parse();
 
     /* Prepare toggle for TEI Header */
     if ( $hasTeiHeader === true ) {
@@ -39,30 +40,38 @@ class ctcTabWidget {
       $ctcDoc = '<div class="cetei-no-documentation">' . wfMessage( 'cetei-no-documentation' )->parse() . '</div>';
     }
 
-    $ctcTabHeaders = '<div class="cetei-nav-container"><div class="cetei-tab-wrapper"><div class="cetei-nav-tabs">';
-    $ctcTabHeaders .= '<a class="nav-tab-item active" href="#nav-pane-1">' . $ctcTabName1 . '</a>';
-    $ctcTabHeaders .= '<a class="nav-tab-item" href="#nav-pane-2">'. $ctcTabName2 .'</a>';
-    $ctcTabHeaders .= '<a class="nav-tab-item" href="#nav-pane-3">' . $ctcTabName3 . '</a></div>' . $ctcTopRight . '</div>';
+    $ctcOpen = '<div class="cetei-nav-container">';
+    $ctcClose = '</div>';
 
-    $ctcTabContent1 = '<div class="cetei-tab-content">';
+    $ctcTabHeaders = <<<EOT
+<div class="cetei-tab-wrapper">
+<div class="cetei-nav-tabs">
+  <a class="nav-tab-item active" href="#nav-pane-1">$ctcTabName1</a>
+  <a class="nav-tab-item" href="#nav-pane-2">$ctcTabName2</a>
+  <a class="nav-tab-item" href="#nav-pane-3">$ctcTabName3</a>
+</div>$ctcTopRight</div>
+EOT;
 
-    $ctcTabContent1 .= '<div class="cetei-tab-pane active" id="nav-pane-1">';
-    $ctcTabContent1 .= $ctcBeforeHeader . $ceteiInstanceDiv;
-    $ctcTabContent1 .= '</div>';
+    $ctcTabContent1 = <<<EOT
+<div class="cetei-tab-content">
+  <div class="cetei-tab-pane active" id="nav-pane-1">$ctcBeforeHeader
+  $ceteiInstanceDiv
+  </div>
+  <div class="cetei-tab-pane" id="nav-pane-2">
+    <div class="cetei-edit-doc">$docBtnStr</div>
+EOT;
+    //doc here = wikitext
+    $ctcTabContent2 = <<<EOT
+</div>
+<div class="cetei-tab-pane" id="nav-pane-3">$sourceCode</div>
+</div>
+<hr/>
+<div class="cetei-credits-bottom">$ctcCreditsBottom</div>
+EOT;
 
-    $ctcTabContent1 .= '<div class="cetei-tab-pane" id="nav-pane-2">';
-    $ctcTabContent1 .= '<div class="cetei-edit-doc">' . $docBtnStr . '</div>';
-    $out->addHTML( $ctcTabHeaders . $ctcTabContent1 );
+    $out->addHTML( $ctcOpen . $ctcTabHeaders . $ctcTabContent1 );
     $out->addWikiTextAsContent( $ctcDoc );
-    $ctcTabContent2 = '</div>';
-
-    $ctcTabContent2 .= '<div class="cetei-tab-pane" id="nav-pane-3">' . $sourceCode . '</div>';
-
-    $ctcTabContent2 .= '</div>';
-
-    $ctcTabContent2 .= '<hr/><div class="cetei-credits-bottom">' . wfMessage( 'cetei-credits-bottom' )->parse() . '</div></div>';
-
-    $out->addHTML( $ctcTabContent2 );
+    $out->addHTML( $ctcTabContent2 . $ctcClose );
 
   }
 

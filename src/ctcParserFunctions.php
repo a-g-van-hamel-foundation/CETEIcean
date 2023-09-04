@@ -12,7 +12,7 @@ use Ctc\Core\ctcXmlProc;
 
 class ctcParserFunctions {
 
-  /* Run #cetei2 string */
+  /* Run #cetei parser function */
   public static function runCeteiPF( $parser, $frame, $args ) {
 
   	$xmlStr = self::getDocXmlStr( $parser, $frame, $args );
@@ -34,9 +34,9 @@ class ctcParserFunctions {
 
   /* Get XML string as object */
   protected static function getDocXmlStr( $parser, $frame, $params ) {
-    $paramDoc = $paramUrl = ''; //default
-    $paramSel = null; //default
-    $outputDefault = null;
+    // defaults
+    $paramDoc = $paramUrl = $text = "";
+    $paramSel = $paramBreak1 = $paramBreak2 = $outputDefault = null;
     //$outputDefault = '<div class="cetei-no-document-found"><i>' . wfMessage( 'cetei-no-document-found' )->parse() . '</i></div>';
     if ( $params == null || $params == 'undefined' ) {
       return $outputDefault;
@@ -59,53 +59,60 @@ class ctcParserFunctions {
       }
       /* */
       switch ( $paramName ) {
-        case 'doc':
-        $paramDoc = $value;
+        case 'doc': $paramDoc = $value;
         break;
-        case 'url':
-        $paramUrl = $value;
+        case 'url': $paramUrl = $value;
         break;
-        case 'sel':
-        $paramSel = $value;
+        case 'sel': $paramSel = $value;
+        break;
+        case 'break1': $paramBreak1 = $value;
+        break;
+        case 'break2': $paramBreak2 = $value;
         break;
       }
-      /*
-      if ( $paramName == 'doc' ) {
-        $paramDoc = $value;
-      } elseif ( $paramName == 'sel' ) {
-        $paramSel = $value;
-      }
-      */
-    }//foreach
+    }    
 
-    $text = '';
     if ( $paramDoc !== '' ) {
       $text = self::getContentfromTitleStr( $paramDoc );
     } else if ( $paramUrl !== '' ) {
-      //$config = \RequestContext::getMain()->getConfig();
       $allowUrl = \RequestContext::getMain()->getConfig()->get( 'CeteiAllowUrl' );
       $defaultNoUrl = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><p>URLs not allowed.</p></text></TEI>';
       $text = ( $allowUrl == true ) ? self::getContentfromUrl( $paramUrl ) : $defaultNoUrl ;
+    } else {
+      return;
     }
 
-    if ( $paramSel == null ) {
+    if ( $paramBreak1 !== null && $paramBreak2 !== null ) {
+      // Experimentally extract and repair
+      $output = self::getFragmentXmlStr ( $text, $paramBreak1, $paramBreak2, $paramDoc );
+    } else if ( $paramSel == null ) {
+      // Full document
       $output = self::getFullDocXmlStr ( $paramDoc, $text );
     } else {
+      // XPath selection
       $output = self::getExcerptDocXmlStr ( $paramDoc, $paramSel, $text );
     }
-    $output = str_replace(array("\r\n", "\r", "\n"), "", trim($output) );
-    return $output;
-  }//end of method
 
+    $output = str_replace(array("\r\n", "\r", "\n", "  " ), " ", trim($output) );
+    return $output;
+  }
+
+  /**
+   * Get full TEI XML document
+   * @param 
+   * @param string text
+   */
   public static function getFullDocXmlStr ( $paramDoc, $text ) {
-    //@todo: xsltprocessor
     $ctcXmlProc = new ctcXmlProc();
     $text = ctcXmlProc::addDocType( $text );
     $output = $ctcXmlProc->transformXMLwithXSL( $text, null );
     return $output;
   }
 
-  public static function getExcerptDocXmlStr ( $paramDoc, $paramSel, $text ) {
+  /**
+   * Extract part of MS using XPath expression
+   */
+  public static function getExcerptDocXmlStr( $paramDoc, $paramSel, $text ) {
     $ctcXmlProc = new ctcXmlProc();
     $text = ctcXmlProc::addDocType( $text );
     $excerpts = [];
@@ -129,9 +136,38 @@ class ctcParserFunctions {
     return $output;
   }
 
-  /* Utility - accept title (string) and return fulltext content  */
-  static private function getContentfromTitleStr( $titleStr ): string {
-    //maybe resolve redirects first?
+  /**
+   * Experimental attempt to extract fragment between self-closing tags,
+   * repair the XML and return result
+   * 
+   * @param string text
+   * @param string break1
+   * @param string break2
+   * @param string paramDoc // not used
+   */
+  public static function getFragmentXmlStr ( $text, $break1, $break2, $paramDoc ) {
+    $extract = ctcXmlExtract::extractFragmentFromXml( $text, $break1, $break2 );
+    if ( gettype ( $extract ) !== 'string' ) {
+      return;
+    }
+    $missingTags = ctcXmlExtract::repairXml( $extract );
+
+    $teiOpen = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader></teiHeader><text type="fragment">';
+    $teiClose = '</text></TEI>';
+    $restoredXml = $teiOpen . $missingTags[0] . $extract . $missingTags[1] . $teiClose;
+
+    $ctcXmlProc = new ctcXmlProc();
+    $text = ctcXmlProc::addDocType( $restoredXml );
+
+    $output = $ctcXmlProc->transformXMLwithXSL( $text, null );
+    return $output;
+  }
+
+  /** 
+   * Utility - accept title (string) and return fulltext content
+   */
+  private static function getContentfromTitleStr( $titleStr ): string {
+    // maybe resolve redirects first?
     $titleObj = \Title::newFromText( $titleStr );
     $wikiObj = \WikiPage::factory( $titleObj );
     $wikiContent = $wikiObj->getContent( RevisionRecord::RAW );
@@ -160,7 +196,8 @@ class ctcParserFunctions {
   }
 
   static private function getDtdContent () {
-    //would be useful
+    // @todo Might be useful
   }
 
-} //end of class
+}
+

@@ -1,12 +1,20 @@
 <?php
 namespace Ctc\Core;
 
+/**
+ * Methods for converting between XML, PHP arrays and HTML output
+ * Reads, extracts and modifies XML
+ */
+
 use MediaWiki\MediaWikiServices;
 
 class ctcXmlProc {
 
   private static function getSimpleXML( $xmlString ) {
       $xml = simplexml_load_string( $xmlString, 'SimpleXMLElement' );
+      if ( $xml == false ) {
+        return false;
+      }
       $xml->registerXPathNamespace("ctc", "http://www.tei-c.org/ns/1.0");
       return $xml;
   }
@@ -57,7 +65,7 @@ class ctcXmlProc {
     return $output;
   }
 
-  public static function addDocType ( $xmlStr ) {
+  public static function addDocType( $xmlStr ) {
     global $IP;
     $config = \RequestContext::getMain()->getConfig();
     $dtd = $config->get( 'CeteiDTD' );
@@ -79,7 +87,10 @@ class ctcXmlProc {
   }
 
   /**
-   * @todo: check libxml security. "Enabling entity substitution may facilitate XML External Entity (XXE) attacks." - see LIBXML_NOENT (int)
+   * Transform the XML string with our XSL stylesheet
+   * 
+   * @param string|null $xmlStr
+   * @param string|null $xmlPath
    **/
   public static function transformXMLwithXSL( $xmlStr = null, $xmlPath = null ) {
     $config = \RequestContext::getMain()->getConfig();
@@ -105,8 +116,5 @@ class ctcXmlProc {
     }
     return $output;
   }
-
-
-
 
 }

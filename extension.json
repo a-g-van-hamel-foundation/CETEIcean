@@ -1,6 +1,6 @@
 {
 	"name": "CETEIcean",
-	"version": "0.2",
+	"version": "0.3",
 	"type": "parserhook",
   "author": [
     "[https://github.com/hcayless Hugh Cayless] and [https://github.com/raffazizzi Raffaele Viglianti] (original creators)",
@@ -10,7 +10,7 @@
   "description": "Implements the JavaScript library [https://github.com/TEIC/CETEIcean CETEIcean] to let users work with and display [https://tei-c.org/ TEI XML documents] on the wiki.",
   "license-name": "GPL-2.0-or-later",
   "requires": {
-		"MediaWiki": ">= 1.31.0",
+		"MediaWiki": ">= 1.38.0",
 		"extensions": {
 
 		}
@@ -39,11 +39,13 @@
 		"ctcHooks": "src/ctcHooks.php",
 		"ctcContentHandler": "src/ctcContentHandler.php",
 		"ctcContent": "src/ctcContent.php",
-    "ctcRender": "src/ctcRender.php",
+    	"ctcRender": "src/ctcRender.php",
 		"ctcParserFunctions": "src/ctcParserFunctions.php",
 		"ctcTabWidget": "src/ctcTabWidget.php",
 		"ctcXmlProc": "src/ctcXmlProc.php",
-		"ctcSpecialPage": "src/ctcSpecialPage.php"
+		"ctcSpecialPage": "src/ctcSpecialPage.php",
+		"ctcUtils": "src/ctcUtils.php",
+		"ctcXmlExtract": "src/ctcXmlExtract"
 	},
 	"AutoloadNamespaces": {
 		"Ctc\\Core\\": "src/",

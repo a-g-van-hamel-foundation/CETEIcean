@@ -12,22 +12,16 @@ use Ctc\Core\ctcTabWidget;
 class ctcRender {
 
   /* Build page in Cetei: namespace */
-  public static function buildPage( $out, $retrievedText ) {
+  public static function buildPage( 
+    $out, // outputPage
+    $retrievedText, // 
+    $pageTitle, // $out->getTitle();
+    $pageName // $out->getTitle()->getText()
+  ) {
 
-    $parser = MediaWikiServices::getInstance()->getParserFactory()->create();
-    $pageTitle = $out->getTitle();
-    $pageName = $out->getTitle()->getText();
-    //$pageUrlRaw = $out->getTitle()->getFullURL( 'action=raw' );
     $tempSpinner = \Html::element( 'span', [
       'class' => 'spinner-dual-ring'
     ], '' );
-    /*
-    $ceteiInstanceDiv = Html::element( 'div', [
-      'id' => 'cetei',
-      'class' => 'cetei-instance',
-      'data-doc' => $pageUrlRaw
-    ], '' );
-    */
     $ctcXmlProc = new ctcXmlProc();
     $newXmlStr = $retrievedText;
     $newXmlStr = $ctcXmlProc->removeDocType( $newXmlStr );
@@ -50,7 +44,8 @@ class ctcRender {
 
     /* /doc subpage: */
     $docPageTitle = $pageTitle . '/doc';
-    if ( self::hasDocPage( $pageTitle ) == true ) {
+    //$out = \RequestContext::getMain()->getOutput();
+    if ( self::hasDocPage( $pageTitle, $out ) == true ) {
       $docAddMsg = wfMessage( 'cetei-edit-documentation' )->parse();
       //$linkDocUrl = Title::newFromText( $docPageTitle )->getFullURL( 'action=edit' );
       $linkDocUrl = wfMessage( 'cetei-edit-documentation-url' )->params( $docPageTitle )->text();
@@ -90,7 +85,7 @@ class ctcRender {
     * $preSourceContent = source code to be rendered with pre tags;
     */
     $tabWidget = new ctcTabWidget();
-    $output = $tabWidget->run(
+    $res = $tabWidget->run(
       $out,
       $pageTitle,
       $ceteiInstanceDiv,
@@ -100,7 +95,7 @@ class ctcRender {
       $hasTeiHeader
     );
 
-    return $output;
+    return $res;
   }
 
   /* Check whether or not current page is an associated /doc subpage */
@@ -113,12 +108,11 @@ class ctcRender {
   }
 
   /* Check whether or not TEI page ($title) has an associated /doc subpage */
-  public static function hasDocPage( $title ) {
+  public static function hasDocPage( $title, $outputPage ) {
     if ( $title ) {
       $docPageStr = $title . '/doc';
     } else {
-      $out = \RequestContext::getMain()->getOutput();
-      $docPageStr = $out->getTitle() . '/doc';
+      $docPageStr = $outputPage->getTitle() . '/doc';
     }
     $docPageObj = \Title::newFromText( $docPageStr );
     $docPageID = $docPageObj->getArticleID() ;

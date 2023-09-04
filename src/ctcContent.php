@@ -52,34 +52,26 @@ class ctcContent extends \TextContent {
          } else {
              return false;
          }
-     }
+  }
 
-  protected function fillParserOutput(
-      \Title $title, $revId,
-  		\ParserOptions $options, $generateHtml,
-      \ParserOutput &$output
-  	) {
+  public function getContentRefreshed( $output ) {
+    $output->updateCacheExpiry(0);
+    $res = $this->getText();
+    return $res;
+  }
 
-  	global $wgTextModelsToParse;
-  	if ( in_array( $this->getModel(), $wgTextModelsToParse ) ) {
-  			// Parse just to get links, etc., into database; HTML is replaced below.
-        $textToParse = $this->updateCacheExpiry(0)->getText(); //invalidates cache
-  			$output = MediaWikiServices::getInstance()->getParser()->parse( $textToParse, $title, $options, true, true, $revId );
-  	}
-
-    $context = new \RequestContext();
-    $out = \RequestContext::getMain()->getOutput();
-
-    $retrievedText = $this->mText;
-
-  	if ( $generateHtml ) {
-      $html = ctcRender::buildPage( $out, $retrievedText );
-  	} else {
-  		$html = '';
-  	}
-
-  	$output->clearWrapperDivClass();
-  	$output->setText( $html );
+  public function getTextForContentHandler() {
+    global $wgTextModelsToParse;
+    if ( in_array( $this->getModel(), $wgTextModelsToParse ) ) {
+			// Parse just to get links, etc., into database; HTML is replaced below.
+			$textToParse = $this->updateCacheExpiry(0)->getText(); // meant to invalidate cache but updateCacheExpiry can only be called on the ParserOutput object. 
+			// $output = $services->getContentRenderer()->getParserOutput( $textToParse, $title, null, $options );
+			//$output = $services->getParser()->parse( $textToParse, $title, $options, true, true, $revId );
+      return $textToParse;
+		} else {
+      $textToParse = $this->updateCacheExpiry(0)->getText();
+    }
+    return $textToParse;
   }
 
 
