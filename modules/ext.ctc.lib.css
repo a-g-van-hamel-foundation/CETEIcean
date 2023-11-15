@@ -1661,16 +1661,6 @@ tei-TEI tei-table {
 tei-table > head {
   text-align: center;
 }
-tei-teiHeader {
-  display: block;
-  /*
-tei-border-radius: 15px;
-tei-border: 1px solid black;
-tei-background:white;
-tei-*/
-  margin-top: 2em;
-  margin-bottom: 2em;
-}
 tei-TEI > tei-text {
   display: block;
   /*

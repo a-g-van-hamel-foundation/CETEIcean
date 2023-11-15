@@ -1,21 +1,17 @@
 <?php
 namespace Ctc\Core;
 
-use Content; //?
-//use MediaWiki\Content\Content;
+use Content;
 use ContentHandler; //?
 use MediaWiki\Content\Renderer\ContentParseParams;
 use MediaWiki\Content\Transform\PreSaveTransformParams;
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\MainConfigNames;
-//use MediaWiki\Revision\SlotRenderingProvider;
-//use MediaWiki\Content\Html;
 use Html;
 use MediaWiki\OutputPage as OutputPage;
 use RequestContext;
 use Title;
-//use MediaWiki\Title\Title; //?
 use ParserOutput;
 use Ctc\Core\ctcContent;
 use Ctc\Core\ctcRender;
@@ -75,7 +71,7 @@ class ctcContentHandler extends \CodeContentHandler {
 	protected function fillParserOutput(
 		Content $content,
 		ContentParseParams $cpoParams, 
-		ParserOutput &$output // not OutputPage
+		ParserOutput &$parserOutput
 	) {
 		$services = MediaWikiServices::getInstance();
 		$pageIdentity = $cpoParams->getPage();
@@ -86,7 +82,8 @@ class ctcContentHandler extends \CodeContentHandler {
 		//checks
 		$generateHtml = $cpoParams->getGenerateHtml(); // true or false
 		if ( $generateHtml == false ) {
-			$output->setText( "..." ); //insert error messsage here
+			$parserOutput->setText( "..." );
+			// @todo insert error messsage here
 			return;
 		}
 		$textModelsToParse = $services->getMainConfig()->get( MainConfigNames::TextModelsToParse );
@@ -94,7 +91,7 @@ class ctcContentHandler extends \CodeContentHandler {
 		$contentModel = $content->getModel(); // expected: cetei
 		if ( in_array( $contentModel, $textModelsToParse ) ) {
 			// Not cetei. Parse just to get links, etc., into database; HTML is replaced below.
-			$output = $services->getParserFactory()->getInstance()->parse(
+			$parserOutput = $services->getParserFactory()->getInstance()->parse(
                      $content->getText(),
                      $pageIdentity,
                      $options,
@@ -103,37 +100,37 @@ class ctcContentHandler extends \CodeContentHandler {
                      $revId
                  );
 		}
-		self::checkContentStatus( $content );
+		self::checkContentStatus( $parserOutput, $content );
 
 		// Get OutputPage from context and buildPage
 		// alternatives haven't worked because of OOUI 
 		$context = new \RequestContext();
 		$outputPage = \RequestContext::getMain()->getOutput(); // Get RequestContext object associated with the main request
-		$freshContent = $content->getContentRefreshed( $output );
+		$freshContent = $content->getContentRefreshed( $parserOutput );
 		ctcRender::buildPage(
 			$outputPage,
 			$freshContent, // $content->getNativeData(),  // 
 			$title, //same as $out->getTitle(),
     		$title->getText() // same as $out->getTitle()->getText()
 		);
+		// 
+		$displayTitle = ctcRender::cleanAndGetHeaderTitle( $freshContent, $title->getText() );
+		$parserOutput->setDisplayTitle( $displayTitle );
+
 		$res = "";
-		$output->clearWrapperDivClass();
-		$output->setText( "" );
+		$parserOutput->clearWrapperDivClass();
+		$parserOutput->setText( "" );
 	}
 
 	/**
-	 * 
+	 * Not used
 	**/
-	private static function checkContentStatus( $content ) {
+	private static function checkContentStatus( &$parserOutput, $content ) {
 		if ( $content->isValid() == false ) {
-			$output->setText( Html::rawElement(
-				'div', 
-				[ 'class' => 'error' ], 
-				""
-			) );
+			$el = Html::rawElement( 'div', [ 'class' => 'error' ], "" );
+			$parserOutput->setText( $el );
 			return;
 		}
 	}
-
 
 }

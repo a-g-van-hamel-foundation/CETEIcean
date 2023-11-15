@@ -6,6 +6,15 @@
 }
 
 /* CUSTOM */
+tei-teiheader {
+  display: block;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  tei-listperson > * {
+    display:list-item;
+    margin: 0 0 0.1rem 1rem;
+  }
+}
 
 tei-head {
     display: block;
@@ -16,8 +25,9 @@ tei-TEI tei-head {
 tei-body > tei-head {
 	text-indent: 0em; // restore
 }
+
 tei-TEI tei-title {
-  font-size: larger;
+  //font-size: larger;
 }
 *[lemma] {
   font-weight:bold;
@@ -26,22 +36,37 @@ tei-rubric {
 	color:darkred;
 }
 
+*[rend="italic"] { font-style:italic; }
+*[rend="underline"] { font-decoration:underline; }
+
 tei-div[type="section"], tei-div[type="excerpt"] {
    display:block;
 }
 tei-div[type="excerpt"] {
   margin-bottom: 1rem;
 }
+tei-div[n],
+tei-div1[n],
+tei-div2[n],
+tei-div[type="section"][n] {
+  display:flex;
+  align-items: baseline;
+  tei-p {
+    margin-top: 0;
+  }
+}
+/* Removed in 0.5
 tei-div[type="section"]:before {
     content: attr(n);
     color: #777;
     display: inline;
     position: absolute;
-    width:3em; /* make sure that three-digit numbers fit and are aligned to the right */
+    width:3em; // make sure that three-digit numbers fit and are aligned to the right
     left: -3em;
     top: auto;
     text-align:right;
 }
+*/
 
 /*
 tei-div1[n] {
@@ -66,6 +91,7 @@ tei-additions::before {
 tei-expan, tei-ex {
     font-style: italic;
 }
+/* Previous
 tei-l {
     display: block;
     padding-left: 5em;
@@ -74,6 +100,18 @@ tei-l {
     max-width: 35em;
     width: 100%;
 }
+*/
+tei-l {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    //padding-left: 5em;
+    //text-indent: -2em;
+    position: relative;
+    max-width: 35em;
+    width: 100%;
+}
+
 /* see Buile Shuibhne - forces line number to precede tei-l on the same line */
 tei-lg tei-lb {
   display: block !important;
@@ -134,9 +172,15 @@ tei-foreign, tei-frn {
 
 /** Behaviours **/
 .tei-number {
-  display: inline-block;
+  //display: inline-block;
+  width: 100%;
+  max-width: 2rem;
   color: grey;
   padding-right: 5px;
+  font-size: smaller;
+  &.tei-number-wide {
+    max-width:5rem;
+  }
 }
 .tei-number.line-number {
   color: grey;
@@ -206,8 +250,12 @@ tei-body tei-head {
   font-size:.85em;
 }
 /* quotes */
+tei-said {
+  color:#414141;
+}
 .cetei-said {
-  color: teal;
+  //color: teal;
+  color: #414141;
   font-weight: bold;
 }
 tei-said tei-said .cetei-said {
@@ -240,9 +288,45 @@ tei-said tei-said .cetei-said {
 
 /* Special page */
 .cetei-specialpage-header .cetei-item {
-  margin-bottom:.4em;
+  margin-bottom: .6em;
+  display: flex;
+  width: 100%;
+  @media (max-width: 670px) {
+    flex-wrap:wrap;
+  }
+  .label {
+    font-weight:bold;
+    display: block;
+    min-width: 10rem;
+    text-align: left;
+    font-size:1rem;
+    padding:0 .2rem 0 0;
+    line-height: inherit;
+  }
+  .description {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-size:1rem;
+    line-height: inherit;
+  }
+}
+.cetei-specialpage-result {
+  width: 100%;
+  .title-link {
+    display:block;
+  }
+  .details {
+    font-size: smaller;
+    display:flex;
+    font-style:italic;
+    & > * {
+      margin-right:.4rem;
+    }
+  }
 }
 
+//
 .cetei-instance {
   &.cetei-rendering {
     opacity:0 !important;
@@ -253,4 +337,43 @@ tei-said tei-said .cetei-said {
     transition: opacity 0.15s ease-in-out;
     //visibility:visible;
   }
+}
+
+/* cetei-align */
+*[type="tei-excerpt-row"] {
+ display:flex;
+ flex-wrap:wrap;
+}
+
+tei-cit[type="tei-excerpt-col"] {
+  padding: 1rem;
+  flex-basis: 0;
+  flex-grow: 1;
+  max-width: 100%;
+  @media screen and (max-width: 768px) {
+    padding: .7rem;
+    flex-basis: max-content;
+  }
+}
+
+// Collapsible
+.tei-anchor-collapsible {
+  cursor: pointer;
+  padding:2px;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: .8rem;
+  color:red;
+}
+.tei-anchor-collapsible.active,
+.tei-anchor-collapsible:hover {
+  background-color:lightgrey;
+}
+.tei-note-collapsible {
+  border-left: 2px solid #977b51;
+  font-size: .9rem;
+  padding: .2rem 0 .2rem 1rem;
+  display: none;
+  overflow: hidden;
 }

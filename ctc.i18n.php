@@ -11,5 +11,7 @@ $magicWords = [];
  */
 
 $magicWords['en'] = [
-   'cetei' => [ 0, 'cetei' ]
+   'cetei' => [ 0, 'cetei' ],
+   'cetei-align' => [ 0, 'cetei-align', 'cetei-parallel' ],
+   'cetei-ace' => [ 0, 'cetei-ace' ]
 ];

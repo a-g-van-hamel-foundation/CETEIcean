@@ -1,3 +1,8 @@
+.ns-350 {
+  .contentHeader { padding-bottom: 1rem; }
+  .contentHeader .firstHeading { margin-bottom: .2rem; }
+}
+
 .cetei-nav-container {
   width:100%;
   min-height:40vh;
@@ -96,10 +101,6 @@
   margin:1rem 0 2rem 0;
 }
 
-.cetei-source-xml {
-  font-size: .8em;
-}
-
 .cetei-btn {
   display: inline-block;
   font-weight: 400;
@@ -191,4 +192,71 @@ tei-teiheader > span {
       }
     }
   }
+}
+
+
+// Source code in new tAmbrois
+.cetei-source-xml {
+  font-size: .9em;
+}
+pre.hljs.cetei-source-xml {
+  display:block;
+  overflow-x:auto;
+  padding:1em;
+  //padding:3px 5px;
+  background:#f3f3f3;
+  color:black;
+
+  .hljs-comment {
+    color:#697070;
+  }
+  .hljs-punctuation, .hljs-tag{color:#444a}
+
+  .hljs-tag .hljs-attr,
+  .hljs-tag .hljs-name{
+    color:rgb(0,22,142);
+  }
+  .hljs-attribute,
+  .hljs-doctag,
+  .hljs-keyword,
+  .hljs-meta .hljs-keyword,
+  .hljs-name,.hljs-selector-tag {
+    font-weight:500;
+  }
+
+  .hljs-deletion,
+  .hljs-number,.hljs-quote,
+  .hljs-selector-class,
+  .hljs-selector-id,
+  .hljs-string,
+  .hljs-template-tag,
+  .hljs-type{
+    //color:#800;
+    color:rgb(3, 106, 7);
+  }
+  .hljs-section,.hljs-title{color:#800;font-weight:700}.hljs-link,.hljs-operator,
+  .hljs-regexp,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo,
+  .hljs-symbol,
+  .hljs-template-variable,
+  .hljs-variable{color:#ab5656}
+  .hljs-literal{color:#695}
+  .hljs-addition, .hljs-built_in, .hljs-bullet, .hljs-code{
+    color:#397300;
+  }
+  .hljs-meta{
+    color:#1f7199;
+  }
+  .hljs-meta .hljs-string{
+    color:rgb(3,106,7);
+  }
+  .hljs-emphasis {
+    font-style:italic;
+  }
+  .hljs-strong {
+    font-weight:700
+  }
+
+
 }

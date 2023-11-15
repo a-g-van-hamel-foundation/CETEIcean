@@ -86,6 +86,20 @@ In (TEI) XML, not all units are necessarily encoded through matching pairs of op
 - Use the `break1` and `break2` parameters to identify the first and final closing tags.
 - For each closing tag, use three consecutive hyphens to delimit the tag name, attribute and value, as in the example above.
 
+## `#cetei-align:`
+```
+{{#cetei-align:
+|resources=Wikipage1^^Wikipage2
+|resourcesep=^^
+|selectors=//text:*[@xml:id='***']^^//tr:*[@n='***']
+|align=1;1
+2;2
+3;3
+4;4
+|valsep=;
+}}
+```
+
 ## Special:CETEIcean
 The special page `Special:CETEIcean` contains basic information about the extension and lists pages in the `Cetei:` namespace.
 
@@ -139,10 +153,10 @@ Default: false (boolean). Whether the parser function when used with `url` shoul
 
 ## Notes
 ### Security: character entities and XXE vulnerabilities
-TEI XML files may contain strings that are intended to encode special characters or symbols. You will recognise these units by the ampersand and semi-colon on either side, e.g. `&ampersir;` for the Insular et-symbol. It is up to the XML parser to substitute them on the basis of character entity references that are defined in a so-called DTD. It can be laborious for users if they are expected to point to a DTD every time they create a new XML document. More seriously, in a wiki environment that is designed to be open to users, character substitution may be especially prone to malicious XML External Entity (XXE) injections (look for LIBXML_NOENT on the web, e.g. [here](https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing)).
+TEI XML files may contain strings that are intended to encode special characters or symbols. You will recognise these units by the ampersand and semi-colon on either side of the string, e.g. `&ampersir;` for the Insular et-symbol. It is up to the XML parser to substitute them on the basis of character entity references that are defined in a so-called DTD. It can be laborious for users if they are expected to point to a DTD every time they create a new XML document. More seriously, in a wiki environment that is designed to be open to users, character substitution may be especially prone to malicious XML External Entity (XXE) injections (look for LIBXML_NOENT on the web, e.g. [here](https://owasp.org/www-community/vulnerabilities/XML_External_Entity_(XXE)_Processing)).
 
 These issues are currently addressed in the following way:
-- DTDs are ignored if they are defined or referenced directly in the document. Although the source code remains untouched, they are removed from the document before the XML parser can have its way with them.
+- DTDs are ignored if they are defined or referenced directly in the document. Although the source code remains untouched, they are removed from the document before the XML parser can interpret them.
 - A single DTD caters for all TEI XML documents on the wiki. CETEIcean comes with a default DTD, but site admins have the option to come up with their own definitions instead. See `$wgCeteiDTD`.
 - Character substitution is disallowed by default, just to be on the safe side, but can be switched back on through the `$wgCeteiAllowEntitySubstitution` config setting (boolean).
 
@@ -154,13 +168,15 @@ These issues are currently addressed in the following way:
 
 ### Known issues
 - ACE tends not to play nice with character entity definitions and produces error warnings for every instance it fails to identify. In some documents, this may throw numerous error warnings saying "Entity not found", obscuring any messages that do matter. By way of a quick and dirty solution, you can hack into `CodeEditor/modules/ace/xml-worker.js` and suppress those warnings by commenting out the line beginning `ErrorHandler.error('entity not found:'+a)`. Make sure to purge cache afterwards, which you may have to attempt repeatedly because it can be stubborn.
-- Syntax errors in your XML document may not always fail gracefully.
+- Syntax errors in your XML document, such as missing tags that result in malformed XML, do not fail gracefully and will prevent the document from getting saved. To help the unsuspecting user, however, the Save button will throw a dialog box if any errors or warnings were detected.
 - It is possible that there are still issues relating to certain types of caching, such as parser cache. You may notice that after a page edit, the output does not represent the latest revision and that a hard refresh is required to fetch it.
 
 ### Developer notes
-- Because this extension was written and tested with MW 1.35, which does not offer support for ES6 with ResourceLoader, the code in CETEIcean’s JS files has been transpiled to ES5 using [Babel js](https://babeljs.io) and a polyfill for custom elements is added as a dependency.
+- Because this extension was first written and tested with MW 1.35, which does not offer support for ES6 with ResourceLoader, the code in CETEIcean’s JS files has been transpiled to ES5 using [Babel js](https://babeljs.io) and a polyfill for custom elements is added as a dependency.
 
 ## Version history
+- 0.5. Added syntax highlighting to "Source code" tab in Cetei namespace (highlight.js). Changed output used for wiki search to be more search-friendly (rendered all entities, added section with attribute values). Added display title to indexing through ParserOutput. Added TEI XML to search profiles. Made certain notes collapsible/expandable. Special:CETEIcean improved and linked from AdminLinks. Custom dialog in event of error or warnings. Styling changes and minor modifications.
+- 0.4. Added `#cetei-align` parser function. Added Ace editor for use in FlexForm and Page Forms (using `#cetei-ace` to load JS).
 - 0.3. Added an experimental feature to `#cetei` for breaking out a fragment between two self-closing tags, typically `pb` or `mls`/`milestone`, having the XML repaired and retrieving an HTML rendering. This is intended for documents in which the position of such tags is too problematic and unpredictable for XPath selection. Extended list of character entities.
 - 0.2. Pre-processing now in XSLT, with continued support for 'behaviors'.
 - 0.1. First release.

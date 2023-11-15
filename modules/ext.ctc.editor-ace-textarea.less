@@ -1,0 +1,40 @@
+/* Css for Ace editor in textareas other than that associated with CodeEditor */
+
+.ace-parent {
+  position: relative;
+  height: 100%;
+}
+
+// Textarea directly associated with FlexForm
+.ace-editor {
+	display:none;
+}
+
+// Parent element of Ace editor
+.ace_editor {
+	position: absolute;
+	font-size: 13px;
+	/* Same as mw-editfont-monospace, repeated for higher specificity */
+	font-family: monospace, monospace;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+	width:100%;
+  height: 100%;
+	min-height: 250px;
+	max-height:100%;
+  line-height: 1.3rem;
+}
+
+.ace_editor textarea,
+.ace_editor input {
+	/* Inherit directionality from editor, not sitedir (T186329) */
+	//direction: inherit;
+}
+
+#ace-editor {
+    position: absolute;
+    width: 500px;
+    height: 400px;
+}

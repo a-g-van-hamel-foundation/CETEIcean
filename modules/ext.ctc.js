@@ -33,10 +33,31 @@ function convertCeteiInstances( divEl ) {
 	});
 }
 
+function makeNotesCollapsible( className ) {
+	var notes = [];
+	var notes = document.getElementsByClassName( className );
+	for (var i = 0; i < notes.length; i++) {
+		notes[i].addEventListener( "click", function() {
+			this.classList.toggle( "active" );
+			var content = this.nextElementSibling;
+			if (content.style.display === "block") {
+				content.style.display = "none";
+			} else {
+				content.style.display = "block";
+			}
+		});
+	}
+}
+
 jQuery(document).ready(function($) {
 	//var ceteiTriggerSel = '.cetei-instance[data-doc]';
 	var ceteiTriggerSel = '.cetei-instance';
 	convertCeteiInstances( ceteiTriggerSel );
+
+	if ( $(".tei-anchor-collapsible")[0] ) {
+		makeNotesCollapsible( "tei-anchor-collapsible" );
+	}
+
 });
 
 // The enclosed code runs only after the page has been loaded and parsed.

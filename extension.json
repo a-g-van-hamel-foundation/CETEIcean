@@ -1,18 +1,17 @@
 {
 	"name": "CETEIcean",
-	"version": "0.3",
+	"version": "0.5",
 	"type": "parserhook",
-  "author": [
-    "[https://github.com/hcayless Hugh Cayless] and [https://github.com/raffazizzi Raffaele Viglianti] (original creators)",
-		"[https://codecs.vanhamel.nl Dennis Groenewegen]"
+	"author": [
+		"[https://github.com/hcayless Hugh Cayless] and [https://github.com/raffazizzi Raffaele Viglianti] (library creators)",
+		"[https://codecs.vanhamel.nl Dennis Groenewegen] (CODECS)"
 	],
-  "url": "https://codecs.vanhamel.nl/CETEIcean",
-  "description": "Implements the JavaScript library [https://github.com/TEIC/CETEIcean CETEIcean] to let users work with and display [https://tei-c.org/ TEI XML documents] on the wiki.",
-  "license-name": "GPL-2.0-or-later",
-  "requires": {
+	"url": "https://codecs.vanhamel.nl/CETEIcean",
+	"description": "Implements the JavaScript library [https://github.com/TEIC/CETEIcean CETEIcean] to let users work with and display [https://tei-c.org/ TEI XML documents] on the wiki.",
+	"license-name": "GPL-2.0-or-later",
+	"requires": {
 		"MediaWiki": ">= 1.38.0",
 		"extensions": {
-
 		}
 	},
 	"namespaces": [
@@ -30,65 +29,70 @@
 			"subpages": true
 		}
 	],
-  "MessagesDirs": {
-	    "CETEIcean": [
-	      "i18n"
-	    ]
-	  },
+	"MessagesDirs": {
+		"CETEIcean": [
+			"i18n"
+		]
+	},
 	"AutoloadClasses": {
 		"ctcHooks": "src/ctcHooks.php",
 		"ctcContentHandler": "src/ctcContentHandler.php",
 		"ctcContent": "src/ctcContent.php",
-    	"ctcRender": "src/ctcRender.php",
+		"ctcRender": "src/ctcRender.php",
 		"ctcParserFunctions": "src/ctcParserFunctions.php",
+		"ctcAlign": "src/ctcAlign.php",
 		"ctcTabWidget": "src/ctcTabWidget.php",
 		"ctcXmlProc": "src/ctcXmlProc.php",
-		"ctcSpecialPage": "src/ctcSpecialPage.php",
 		"ctcUtils": "src/ctcUtils.php",
-		"ctcXmlExtract": "src/ctcXmlExtract"
+		"ctcXmlExtract": "src/ctcXmlExtract",
+		"ctcSpecialPage": "src/special/ctcSpecialPage.php",
+		"ctcSpecialUtils": "src/special/ctcSpecialUtils.php"
 	},
 	"AutoloadNamespaces": {
 		"Ctc\\Core\\": "src/",
-		"Ctc\\Special\\": "src/"
-  },
-  "ExtensionMessagesFiles": {
+		"Ctc\\Special\\": "src/special"
+	},
+	"ExtensionMessagesFiles": {
 		"ctcMagic": "ctc.i18n.php",
 		"ctcNamespaces": "ctc.i18n.namespaces.php"
 	},
-
-  "Hooks": {
+	"Hooks": {
+		"AdminLinks": [
+			"ctcHooks::addToAdminLinks"
+		],
 		"CodeEditorGetPageLanguage": "ctcHooks::onCodeEditorGetPageLanguage",
-    "ParserFirstCallInit": [ "ctcHooks::onParserFirstCallInit" ],
 		"BeforePageDisplay": [ "ctcHooks::onBeforePageDisplay" ],
+		"ParserFirstCallInit": [ "ctcHooks::onParserFirstCallInit" ],
 		"Register": [  "ctcHooks::onRegister" ],
 		"ContentHandlerDefaultModelFor": [ "ctcHooks::contentHandlerDefaultModelFor" ],
+		"ParserAfterTidy": [ "ctcHooks::disableParserCache" ],
 		"ResourceLoaderGetConfigVars": [ "ctcHooks::onResourceLoaderGetConfigVars" ],
-		"ParserAfterTidy": [ "ctcHooks::disableParserCache" ]
+		"SpecialSearchProfiles": "ctcHooks::onSpecialSearchProfiles"
 	},
 	"ContentHandlers": {
 		"cetei": "Ctc\\Core\\ctcContentHandler"
 	},
 	"ResourceFileModulePaths": {
-    "localBasePath": "modules",
-    "remoteExtPath": "CETEIcean/modules"
-  },
+		"localBasePath": "modules",
+		"remoteExtPath": "CETEIcean/modules"
+	},
 	"ResourceModules": {
 		"ext.ctc": {
-      "packageFiles": [
+			"packageFiles": [
 				"ext.ctc.js"
-      ],
-      "messages": [
+			],
+			"messages": [
 				"cetei-document-invalid",
 				"cetei-header-not-available",
 				"cetei-teiheader-toggle-show",
 				"cetei-teiheader-toggle-hide"
-      ],
-      "dependencies": [
+	  		],
+	 		"dependencies": [
 				"ext.ceteicean.es5",
 				"mediawiki.util",
 				"ext.ctc.icons"
-      ]
-    },
+	  		]
+		},
 		"ext.ctc.styles": {
 			"styles": [
 				"ext.ctc.lib.css",
@@ -96,9 +100,9 @@
 			]
 		},
 		"ext.ctc.behaviors": {
-      "packageFiles": [
+			"packageFiles": [
 				"ext.ctc.behaviors.js"
-      ]
+			]
 		},
 		"ext.ceteicean.es5": {
 			"packageFiles": [
@@ -124,6 +128,9 @@
 		"ext.ctc.wikieditor": {
 			"packageFiles": [
 				"ext.ctc.editor.js"
+			],
+			"messages": [
+				"cetei-editor-check-errors"
 			]
 		},
 		"ext.ctc.editor.styles": {
@@ -171,6 +178,55 @@
 						"file": "code.svg"
 					}
 				}
+		},
+		"ext.ctc.ace": {
+			"packageFiles": [
+				"ext.ctc.editor-ace-textarea.js"
+			],
+			"dependencies": [
+				"ext.ace.lib",
+				"ext.ace.utils"
+			]
+		},
+		"ext.ctc.ace.styles": {
+			"styles": [
+				"lib.ace.less",
+				"ext.ctc.editor-ace-textarea.less"
+			]
+		},
+		"ext.ace.lib": {
+			"localBasePath": "modules",
+			"remoteExtPath": "CETEIcean/modules",
+			"packageFiles": [
+				"ace/ace.js"
+			]
+		},
+		"ext.ace.utils": {
+			"localBasePath": "modules/ace",
+   			"remoteExtPath": "CETEIcean/modules/ace",
+			"packageFiles": [
+				"mode-xml.js",
+				"worker-xml.js"
+			]
+		},
+
+		"ext.highlight": {
+			"localBasePath": "modules",
+   			"remoteExtPath": "CETEIcean/modules",
+			"packageFiles": [
+				"ext.highlight.js"
+			],
+			"dependencies": [
+				"ext.highlight.lib",
+				"ext.es5.shim"
+			]
+		},
+		"ext.highlight.lib": {
+			"localBasePath": "modules/lib-highlight-xml",
+   			"remoteExtPath": "CETEIcean/modules/lib-highlight-xml",
+			"packageFiles": [
+				"highlight.min.js"
+			]
 		}
 	},
 	"SpecialPages": {
@@ -207,7 +263,6 @@
 	"ConfigRegistry": {
 		"CETEIcean": "GlobalVarConfig::newInstance"
 	},
-  "manifest_version": 2,
-  "load_composer_autoloader": false
-
+	"manifest_version": 2,
+	"load_composer_autoloader": false
 }
