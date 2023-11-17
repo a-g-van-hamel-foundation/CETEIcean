@@ -1,4 +1,4 @@
-# CETEIcean extension for MediaWiki (beta)
+# CETEIcean extension for MediaWiki
 
 The CETEIcean extension is an extension to MediaWiki which implements the [CETEIcean](https://github.com/TEIC/CETEIcean) library (pronounce: `/sɪˈti:ʃn/`) to let users collaborate on [TEI XML](https://tei-c.org/) documents and present them on the wiki. CETEIcean converts your source document using HTML5 Custom Elements (CE) of the Web Components standards, preserving much of the structure of the original document. This extension attempts to combine the best of both worlds: XSLT for the initial stage of processing XML and JavaScript for registering CE and applying custom behaviours.
 
