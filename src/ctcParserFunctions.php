@@ -13,9 +13,13 @@ use Ctc\Core\ctcXmlProc;
 class ctcParserFunctions {
 
 	/* Run #cetei parser function */
-	public static function runCeteiPF( $parser, $frame, $args ) {
+	public static function runCeteiPF( \Parser $parser, $frame, $args ) {
 
 		$xmlStr = self::getDocXmlStr( $parser, $frame, $args );
+		if ( $xmlStr == null ) {
+			// @todo 
+			$xmlStr = "";
+		}
 			//$xml = simplexml_load_string( $xmlStr, 'SimpleXMLElement' );
 			//$xml->registerXPathNamespace("def", "http://www.tei-c.org/ns/1.0");
 		$randomNo1 = rand(1000, 9999);
@@ -29,7 +33,6 @@ class ctcParserFunctions {
 		);
 
 		return [ $output, 'noparse' => true, 'isHTML' => true ];
-
 	}
 
 	public static function runCeteiAlignPF( $parser, $frame, $params ) {
@@ -38,6 +41,8 @@ class ctcParserFunctions {
 		$resourceSep = "^^";
 		$valSep = ";";
 		$selectors = "//ctc:xml:id[@n='***']";
+		$rangeSep = null;
+		$action = "normal";
 
 		foreach ( $params as $i => $param ) {
 			$paramExpanded = $frame->expand($param);
@@ -59,12 +64,23 @@ class ctcParserFunctions {
 				break;
 				case 'align': $alignCsvStr = $value;
 				break;
+				case 'map': $alignCsvStr = $value;
+				break;
 				case 'valsep': $valSep = $value;
+				break;
+				case 'rangesep': $rangeSep = $value;
+				break;
+				case 'action': $action = $value;
 				break;
 			}
 		}
 
-		$xmlStr = ctcAlign::align( $resourceStr, $resourceSep, $selectors, $alignCsvStr, $valSep );
+		if ( $action == 'info' ) {
+			$info = ctcParserFunctionsInfo::getParserFunctionInfo( 'cetei-align' );
+			return $parser->recursiveTagParse( $info );
+		}
+
+		$xmlStr = ctcAlign::align( $resourceStr, $resourceSep, $selectors, $alignCsvStr, $valSep, $rangeSep );
 		$ctcXmlProc = new ctcXmlProc();
 		$xmlTransformed = $ctcXmlProc->transformXMLwithXSL( $xmlStr, null );
 
@@ -81,22 +97,27 @@ class ctcParserFunctions {
 
 	/**
 	 * Load js - {{#cetei-ace:}}
+	 * @todo maybe add check if CodeEditor is installed.
 	 */
 	public static function runCeteiAcePF( $parser, $frame, $params ) {
-		// maybe add check if CodeEditor is installed
 		$out = $parser->getOutput();
 		$out->addModuleStyles( [ "ext.ctc.ace.styles" ] );
 		$out->addModules( [ "ext.ctc.ace" ] );
 	}
 
-	/* Get XML string as object */
-	protected static function getDocXmlStr( $parser, $frame, $params ) {
+	/**
+	 * Get XML string.
+	 * Null if params are wanting or an error was returned
+	 * @return string|null
+	 **/
+	protected static function getDocXmlStr( \Parser $parser, $frame, $params ): string|null {
 		// Defaults
 		$paramDoc = $paramUrl = $text = "";
-		$paramSel = $paramBreak1 = $paramBreak2 = $outputDefault = null;
+		$paramSel = $paramBreak1 = $paramBreak2 = null;
+		$action = "normal";
 		// $outputDefault = '<div class="cetei-no-document-found"><i>' . wfMessage( 'cetei-no-document-found' )->parse() . '</i></div>';
 		if ( $params == null || $params == 'undefined' ) {
-			return $outputDefault;
+			return null;
 		}
 
 		foreach ( $params as $i => $param ) {
@@ -126,8 +147,15 @@ class ctcParserFunctions {
 				break;
 				case 'break2': $paramBreak2 = $value;
 				break;
+				case 'action': $action = $value;
+				break;
 			}
-		}    
+		}
+
+		if ( $action == 'info' ) {
+			$info = ctcParserFunctionsInfo::getParserFunctionInfo( 'cetei' );
+			return $parser->recursiveTagParse( $info );
+		}
 
 		// cf. ctcUtils::getContentFromPageTitleOrUrl()
 		if ( $paramDoc !== '' ) {
@@ -137,7 +165,7 @@ class ctcParserFunctions {
 			$defaultNoUrl = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><p>URLs not allowed.</p></text></TEI>';
 			$text = ( $allowUrl == true ) ? ctcUtils::getContentfromUrl( $paramUrl, "" ) : $defaultNoUrl ;
 		} else {
-			return;
+			return null;
 		}
 
 		if ( $paramBreak1 !== null && $paramBreak2 !== null ) {
@@ -151,8 +179,11 @@ class ctcParserFunctions {
 			$output = self::getExcerptDocXmlStr ( $paramDoc, $paramSel, $text );
 		}
 
-		$output = str_replace(array("\r\n", "\r", "\n", "  " ), " ", trim($output) );
-		return $output;
+		$res = null;
+		if ( $output !== null && $output !== false ) {
+			$res = str_replace(array("\r\n", "\r", "\n", "  " ), " ", trim($output) );
+		}
+		return $res;
 	}
 
 	/**
@@ -168,28 +199,26 @@ class ctcParserFunctions {
 	}
 
 	/**
-	 * Extract part of MS using XPath expression
+	 * Extract part of MS using XPath expression.
+	 * Return empty document if no excerpt was created.
 	 */
-	public static function getExcerptDocXmlStr( $paramDoc, $paramSel, $text ) {
+	public static function getExcerptDocXmlStr( $paramDoc, $paramSel, $text ): mixed {
 		$ctcXmlProc = new ctcXmlProc();
 		$text = ctcXmlProc::addDocType( $text );
 		$excerpts = [];
 		//$seltest = "//ctc:p[@xml:id='p1']";
-		$excerpts = ctcXmlProc::getExcerpts( $text, $paramSel );
+		$excerpts = ctcXmlProc::getExcerpts( $text, $paramSel );		
 		$excerptStr = '';
 		if ( $excerpts !== false ) {
 			foreach ( $excerpts as $excerpt ) {
 				$excerptStr .= '<div type="excerpt">'. $excerpt->asXml() . '</div>';
 			}
-		} else {
-			//do nothing?
 		}
-		$teiOpen = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><text type="excerpts">';
-		$teiClose = '</text></TEI>';
-		$text = $teiOpen . $excerptStr . $teiClose;
-		// weird we already did this
-		$text = ctcXmlProc::addDocType( $text );
 
+		// Prepare and transform excerpt
+		// involves treating it as a new document
+		$text = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><text type="excerpts">' . $excerptStr . '</text></TEI>';
+		$text = ctcXmlProc::addDocType( $text );
 		$output = $ctcXmlProc->transformXMLwithXSL( $text, null );
 
 		return $output;
@@ -222,9 +251,4 @@ class ctcParserFunctions {
 		return $output;
 	}
 
-	static private function getDtdContent () {
-		// @todo Might be useful
-	}
-
 }
-

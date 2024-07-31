@@ -8,14 +8,14 @@ use MediaWiki\ParserOutput;
 use MediaWiki\Revision\RevisionRecord;
 
 /**
- * @todo Move big chunk to sth like ctcXmlExtract::...
+ * Collection of helper methods
  */
 
 class ctcUtils {
 
 	/**
 	 * Check if present user is in the 'user' group
-	 * Originally in ctcRender
+	 * Originally part of ctcRender class
 	 * @todo: change hardcoded 'user' to language-independent value?
 	 * @todo: check whether user has editing rights = preferred action
 	*/
@@ -35,18 +35,18 @@ class ctcUtils {
 	 */
 	public static function hasDocPage( $title ) {
 		if ( $title ) {
-		$docPageStr = $title . '/doc';
+			$docPageStr = $title . '/doc';
 		} else {
-		$out = \RequestContext::getMain()->getOutput();
-		$docPageStr = $out->getTitle() . '/doc';
+			$out = \RequestContext::getMain()->getOutput();
+			$docPageStr = $out->getTitle() . '/doc';
 		}
 		$docPageObj = \Title::newFromText( $docPageStr );
 		$docPageID = $docPageObj->getArticleID() ;
 		// if Page ID equals 0, page does not exist
 		if ( $docPageID !== 0 ) {
-		return true;
+			return true;
 		} else {
-		return false;
+			return false;
 		}
 	}
 
@@ -59,9 +59,6 @@ class ctcUtils {
 		$xmlOpeningTag = '<?xml version="1.0" encoding="UTF-8"?>';
 		if ( $docType == "wikipage" ) {
 			$text = self::getContentfromTitleStr( $doc, $default );
-			if ( $doc == "Cetei:Docments/1556114082" ) {
-				print_r( "<pre>" . htmlspecialchars($text) . "</pre>" );
-			}
 		} else if ( $docType == "url" ) {
 			$allowUrl = \RequestContext::getMain()->getConfig()->get( 'CeteiAllowUrl' );
 			$defaultNoUrl = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><p>URLs not allowed.</p></text></TEI>`;
@@ -122,8 +119,44 @@ class ctcUtils {
 		return $link;
 	}
 
+	public static function removeInlineComments( $str ) {
+		$str = preg_replace( '/<!--.*?-->/s', '', $str );
+		return $str;
+	}
+
+	public static function isSyntaxHighlightAvailable(): bool {
+		$registry = \ExtensionRegistry::getInstance();
+		if ( $registry->isLoaded( 'SyntaxHighlight' ) == true || $registry->isLoaded( 'highlight.js integration' ) == true ) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
-	 * Convenience methods for testing only.
+	 * Converts array to JSON string to be displayed on the wiki.
+	 */
+	public static function showArrayAsJsonInWikiText( array $arr ): string {
+		$registry = \ExtensionRegistry::getInstance();
+		if ( $registry->isLoaded( 'SyntaxHighlight' ) == true || $registry->isLoaded( 'highlight.js integration' ) == true )  {
+			$str = "<syntaxhighlight lang='json'>" . json_encode( $arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "</syntaxhighlight>";
+		} else {
+			$str = "<pre lang='json'>" . json_encode( $arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "</pre>";
+		}
+		return $str;
+	}
+
+	/**
+	 * @deprecated
+	 */
+	public static function getTemporarySpinner() {
+		$tempSpinner = \Html::element( 'span', [
+			'class' => 'spinner-dual-ring'
+		], '' );
+		return $tempSpinner;
+	}
+
+	/**
+	 * Convenience methods for testing in development only.
 	 */
 	public static function printArray( $arr ) {
 		print_r( "<pre>" );

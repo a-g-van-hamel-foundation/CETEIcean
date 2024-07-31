@@ -14,48 +14,49 @@ class ctcRender {
 
 	/**
 	 * Build page in Cetei: namespace
+	 * $pageTitle // $out->getTitle() ?
+	 *  // $out->getTitle()->getText() ?
 	 **/
-	public static function buildPage( 
-		$out, // outputPage
-		$retrievedText, //
-		$pageTitle, // $out->getTitle();
-		$pageName // $out->getTitle()->getText()
+	public static function buildPage(
+		\OutputPage $out,
+		string $retrievedText,
+		$pageTitle,
+		$pageName
 	) {
-
-		$tempSpinner = \Html::element( 'span', [
-			'class' => 'spinner-dual-ring'
-		], '' );
+		$context = \RequestContext::getMain();
+		//$out = \RequestContext::getMain()->getOutput();
 		$ctcXmlProc = new ctcXmlProc();
-		$newXmlStr = $retrievedText;
-		$newXmlStr = $ctcXmlProc->removeAndAddDocType( $newXmlStr );
 
-		$transformedXml = $ctcXmlProc->transformXMLwithXSL( $newXmlStr, null );
+		// Transform XML and create HTML
+		$newXmlStr = $ctcXmlProc->removeAndAddDocType( $retrievedText );
+		$transformedXml = $ctcXmlProc->transformXMLwithXSL( $newXmlStr, null );		
 		$ceteiInstanceDiv = \Html::rawElement( 'div', [
 			'id' => 'cetei',
 			'class' => 'cetei-instance cetei-ns-instance cetei-rendering'
 			//'data-doc' => $pageUrlRaw
 		], $transformedXml );
 
-		$out->addModules( [ 'ext.highlight' ] );
-
+		// XML source code to be shown in pre tags
 		$preSourceContent = \Html::element(
 			'pre', [
 				'lang'=>'xml',
-				'class'=>'cetei-source-xml language-xml'
-			],
-			$retrievedText
-		); //Source code to be shown in pre tags
-		/* Because hidden comments could potentially be an issue to xml parse: */
+				'class'=>'language-xml cetei-source-xml'
+			], $retrievedText
+		);
+		if ( strlen( $transformedXml ) < 1000000 ) {
+			// Not yet suitable for large documents
+			$out->addModules( [ 'ext.highlight' ] );
+		}
 
+		// Hidden comments could potentially be an issue to xml parse
 		$sourceContent = preg_replace( '/<!--.*?-->/s', '', $newXmlStr );
 
-		/* /doc subpage: */
+		// /doc subpage:
 		$docPageTitle = $pageTitle . '/doc';
-		//$out = \RequestContext::getMain()->getOutput();
 		if ( self::hasDocPage( $pageTitle, $out ) == true ) {
-			$docAddMsg = wfMessage( 'cetei-edit-documentation' )->parse();
+			$docAddMsg = $context->msg( 'cetei-edit-documentation' )->parse();
 			//$linkDocUrl = Title::newFromText( $docPageTitle )->getFullURL( 'action=edit' );
-			$linkDocUrl = wfMessage( 'cetei-edit-documentation-url' )->params( $docPageTitle )->text();
+			$linkDocUrl = $context->msg( 'cetei-edit-documentation-url' )->params( $docPageTitle )->text();
 			if ( ctcUtils::isUser() == true ) {
 				$docBtnStr = self::createButtonWidget( $out, $docAddMsg, $linkDocUrl, 'edit', null );
 			} else {
@@ -63,12 +64,12 @@ class ctcRender {
 			}
 			$docPageStr = self::showDocPage( $out, $pageTitle );
 		} else {
-			$docBtnStr = ''; //default
-			$docPageStr = ''; //default
-			if ( ctcUtils::isUser() == true ) {
+			// defaults
+			$docBtnStr = $docPageStr = "";
+			if ( ctcUtils::isUser() ) {
 				//$linkDocUrl = Title::newFromText( $docPageTitle )->getFullURL( 'action=edit' );
-				$linkDocUrl = wfMessage( 'cetei-edit-documentation-url' )->params( $docPageTitle )->text();
-				$docAddMsg = wfMessage( 'cetei-add-documentation' )->parse();
+				$linkDocUrl = $context->msg( 'cetei-edit-documentation-url' )->params( $docPageTitle )->text();
+				$docAddMsg = $context->msg( 'cetei-add-documentation' )->parse();
 				$docBtnStr = self::createButtonWidget( $out, $docAddMsg, $linkDocUrl, 'edit', null );
 			} else {
 				$docPageStr = '';
@@ -107,12 +108,18 @@ class ctcRender {
 		return $res;
 	}
 
-	public static function cleanAndGetHeaderTitle( $xmlStr, $pageName ) {
+	/**
+	 * Clean XML string and get a title from TEI Header
+	 * Defaults to $pageName
+	 */
+	public static function cleanAndGetHeaderTitle( $xmlStr, string $pageName ) {
 		$ctcXmlProc = new ctcXmlProc();
+		// sanitise: remove inline comments
+		$xmlStr = preg_replace( '/<!--.*?-->/s', '', $xmlStr );
+		// out with the old, in with the new doc type
 		$newXmlStr = $ctcXmlProc->removeAndAddDocType( $xmlStr );
-		$sourceContent = preg_replace( '/<!--.*?-->/s', '', $newXmlStr );
-		// 
-		$ctcHeaderTitle = $ctcXmlProc->getHeaderTitle( $sourceContent );
+		//$sourceContent = preg_replace( '/<!--.*?-->/s', '', $newXmlStr );
+		$ctcHeaderTitle = $ctcXmlProc->getHeaderTitle( $newXmlStr );
 		$displayTitle = ( $ctcHeaderTitle !== null ) ? self::sanitiseDisplayTitle($ctcHeaderTitle) : $pageName;
 		return $displayTitle;
 	}

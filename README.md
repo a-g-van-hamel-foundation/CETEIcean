@@ -1,10 +1,10 @@
-# CETEIcean extension for MediaWiki (beta)
+# CETEIcean extension for MediaWiki
 
 The CETEIcean extension is an extension to MediaWiki which implements the [CETEIcean](https://github.com/TEIC/CETEIcean) library (pronounce: `/sɪˈti:ʃn/`) to let users collaborate on [TEI XML](https://tei-c.org/) documents and present them on the wiki. CETEIcean converts your source document using HTML5 Custom Elements (CE) of the Web Components standards, preserving much of the structure of the original document. This extension attempts to combine the best of both worlds: XSLT for the initial stage of processing XML and JavaScript for registering CE and applying custom behaviours.
 
 Its support for working with TEI XML is twofold: first, TEI XML documents can be created, edited and displayed in a dedicated namespace of the wiki; and second, a parser function (`#cetei`) can be used to embed documents, or even discrete sections of them, inline in wikitext.
 
-This extension is being created for the CODECS website (https://codecs.vanhamel.nl), a project published by the [A. G. van Hamel Foundation for Celtic Studies](https://stichting.vanhamel.nl). It is currently in beta status and functionality at this stage is likely to be tied closely to the needs of the CODECS platform. It is not dependent on this environment, however, and you’re welcome to try it out and provide feedback or patches.
+Since this extension is created for the CODECS website (https://codecs.vanhamel.nl), a project published by the [A. G. van Hamel Foundation for Celtic Studies](https://stichting.vanhamel.nl), functionality at this stage is likely to be tied closely to the needs of the CODECS platform. It is not dependent on this environment, however, and you’re welcome to try it out and provide feedback or patches.
 
 ### Functionality: store and present documents
 This extension creates a dedicated namespace with the `Cetei:` namespace prefix, which is where TEI XML documents can be stored and displayed.
@@ -175,6 +175,7 @@ These issues are currently addressed in the following way:
 - Because this extension was first written and tested with MW 1.35, which does not offer support for ES6 with ResourceLoader, the code in CETEIcean’s JS files has been transpiled to ES5 using [Babel js](https://babeljs.io) and a polyfill for custom elements is added as a dependency.
 
 ## Version history
+- 0.6. Added support for ranges in `#cetei-align`. Further default entities added (all from iso-grk1.ent, n/N with macron, etc.). Use 'displaytitle' to sort and show results in Special:CETEIcean. Reduced sensitivity to XML errors. Fixed preview in edit mode. Deactivated syntax highlighting for exceptionally lengthy documents to prevent it from freezing the browser. With `action=info`, both `#cetei` and `#cetei-align` can provide self-documentation about parameters used. Styling changes. Removed 'beta' status.
 - 0.5. Added syntax highlighting to "Source code" tab in Cetei namespace (highlight.js). Changed output used for wiki search to be more search-friendly (rendered all entities, added section with attribute values). Added display title to indexing through ParserOutput. Added TEI XML to search profiles. Made certain notes collapsible/expandable. Special:CETEIcean improved and linked from AdminLinks. Custom dialog in event of error or warnings. Styling changes and minor modifications.
 - 0.4. Added `#cetei-align` parser function. Added Ace editor for use in FlexForm and Page Forms (using `#cetei-ace` to load JS).
 - 0.3. Added an experimental feature to `#cetei` for breaking out a fragment between two self-closing tags, typically `pb` or `mls`/`milestone`, having the XML repaired and retrieving an HTML rendering. This is intended for documents in which the position of such tags is too problematic and unpredictable for XPath selection. Extended list of character entities.

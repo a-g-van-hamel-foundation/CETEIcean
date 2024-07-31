@@ -9,6 +9,9 @@ use Ctc\Core\ctcParserFunctions;
 
 class ctcHooks {
 
+	/**
+	 * @link https://www.mediawiki.org/wiki/Manual:Hooks/BeforePageDisplay
+	 */
 	public static function onBeforePageDisplay( $out, $skin ): void {
 
 		$namespaceConstant = $out->getTitle()->getNamespace();
@@ -28,10 +31,10 @@ class ctcHooks {
 
 	}
 
-	/*
-	** Content handler for namespace through callback
-	** extension.json has "callback": "ctcHooks::onRegister"
-	*/
+	/**
+	 * Content handler for namespace through callback
+	 * (extension.json has "callback": "ctcHooks::onRegister")
+	 */
 	public static function onRegister() {
 		define( 'CONTENT_MODEL_XML', 'cetei' );
 		//define( 'CONTENT_FORMAT_XML', 'application/tei+xml' );
@@ -40,10 +43,9 @@ class ctcHooks {
 	}
 
 	/**
-	 * Content model XML default in NS_CETEI NS, except for /doc pages 
-	 **/
+	 * Content model XML default in NS_CETEI NS, except for /doc pages
+	 */
 	public static function contentHandlerDefaultModelFor( Title $title, &$model ) {
-
 		$isDoc = ctcRender::isDocPage( $title );
 		$nameSpace = $title->getNamespace();
 		if ( $nameSpace === NS_CETEI && $isDoc !== true ) {
@@ -52,24 +54,25 @@ class ctcHooks {
 		} else {
 			return true;
 		}
-
 	}
 
 	/**
-	 * Enable CodeEditor through a hook
+	 * Enable CodeEditor through a hook.
+	 * Must abort (return false) after 'xml' added.
+	 * @link https://github.com/wikimedia/mediawiki-extensions-CodeEditor/blob/master/includes/Hooks/CodeEditorGetPageLanguageHook.php
+	 * @link https://github.com/wikimedia/mediawiki-extensions-CodeEditor/blob/master/includes/Hooks/HookRunner.php
 	 **/
 	public static function onCodeEditorGetPageLanguage( Title $title, &$lang ) {
 		$isDoc = ctcRender::isDocPage( $title );
 		if ( $title->getNamespace() === NS_CETEI && $isDoc !== true ) {
 			$lang = 'xml';
-			return true;
-		} else {
-			return false;
+			//return false;
 		}
+		return true;
 	}
 
 	/**
-	 * Register hook for parser functions #cetei, #cetei-align, #cetei-ace
+	 * Register hooks for parser functions #cetei, #cetei-align, #cetei-ace
 	 **/
 	public static function onParserFirstCallInit( Parser $parser ) {
 		// Register any render callbacks with the parser
@@ -146,7 +149,6 @@ class ctcHooks {
 				'CETEIcean'
 			)
 		);
-
 		return true;
 	}
 

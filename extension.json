@@ -1,6 +1,6 @@
 {
 	"name": "CETEIcean",
-	"version": "0.5",
+	"version": "0.6-alpha",
 	"type": "parserhook",
 	"author": [
 		"[https://github.com/hcayless Hugh Cayless] and [https://github.com/raffazizzi Raffaele Viglianti] (library creators)",
@@ -40,6 +40,7 @@
 		"ctcContent": "src/ctcContent.php",
 		"ctcRender": "src/ctcRender.php",
 		"ctcParserFunctions": "src/ctcParserFunctions.php",
+		"ctcParserFunctionsInfo": "src/ctcParserFunctionsInfo.php",
 		"ctcAlign": "src/ctcAlign.php",
 		"ctcTabWidget": "src/ctcTabWidget.php",
 		"ctcXmlProc": "src/ctcXmlProc.php",

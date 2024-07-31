@@ -68,26 +68,31 @@ class ctcSpecialPage extends \QueryPage {
 	/**
 	 * Query for pages in the NS_CETEI namespace.
 	 * Skip those with wikitext content models = /doc
+	 * Uses IDatabase::select() internally
 	 */
-	function getQueryInfo() {
+	public function getQueryInfo() {
 		$res = [];
 		if ( NS_CETEI !== 'undefined' ) {
 			$pages = [
-				'tables' => [ 'page' ],
-				'fields' => [ 
-					'page_title AS title',
-					'page_title AS value',
-					'page_id as pageid',
-					//'rev_id AS revid'
-					'page_latest AS pagelatest'
+				'tables' => [ 'page', 'page_props' ],
+				'fields' => [
+					'title' => 'page_title', // pagename
+					'value' => 'pp_value', // displaytitle, sortable
+					'displaytitle' => 'pp_value', // displaytitle, sortable
+					'pageid' => 'page_id',
+					'pagelatest' => 'page_latest'
 				],
 				'conds' => [
 					'page_namespace' => NS_CETEI,
 					'page_is_redirect' => 0,
 					'page_content_model' => 'cetei'
+				],
+				'join_conds' => [
+					'page_props' => [
+						'INNER JOIN',
+						'pp_page = page_id' // Unknown column 'page_props.pp_page' in 'on clause'
+					]
 				]
-				// options
-				// join_conds:
 			];
 			$res = $pages;
 		}
@@ -100,11 +105,18 @@ class ctcSpecialPage extends \QueryPage {
 
 	function formatResult( $skin, $result ) {
 		$oldestTimestamp = "";
-		$pageName = $result->value;
+		$pageName = $result->title;
 		//$pageid = $result->pageid;
 		$pagelatest = $result->pagelatest;
 		$title = \Title::makeTitle( NS_CETEI, $pageName ); // object
 		$docTitle = \Title::makeTitle( NS_CETEI, $pageName . "/doc" );
+
+		$visibleTitle = ( $result->displaytitle !== '1' ) ? $result->displaytitle : str_replace( "_", " ", $result->title );
+		/*
+		$displaytitleArr = MediaWikiServices::getInstance()->getPageProps()->getProperties( $title, 'displaytitle' );
+		$displaytitle = implode( "", $displaytitleArr );
+		$visibleTitle = ( $displaytitle !== "" ) ? $displaytitle : htmlspecialchars( $title->getText() );
+		*/
 
 		$wikiPageFactory = MediaWikiServices::getInstance()->getWikiPageFactory();
 		$wikiPage = $wikiPageFactory->newFromTitle( $title );
@@ -120,14 +132,15 @@ class ctcSpecialPage extends \QueryPage {
 		$revisionStore = MediaWikiServices::getInstance()->getRevisionStore();
 		$firstRevision = $revisionStore->getFirstRevision( $title );
 		$oldestTimestampUnix =  \MWTimestamp::convert( TS_UNIX, $firstRevision->getTimestamp() );
-		$oldestTimestamp =  date( 'Y-m-d', $oldestTimestampUnix );
+		$oldestTimestamp = date( 'Y-m-d', $oldestTimestampUnix );
 		// same as $firstRevision->getUser() :
 		$creator = $wikiPage->getCreator()->getName();
 
 		$editUrl = \Title::newFromText( $pageName, NS_CETEI )->getFullURL( 'action=edit' );
 		$editLink = \Html::element( "a", [ "href" => $editUrl ], "edit" );
 
-		$titleLink = $this->getLinkRenderer()->makeKnownLink( $title, htmlspecialchars( $title->getText() ) );
+		// $titleLink = $this->getLinkRenderer()->makeKnownLink( $title, htmlspecialchars( $title->getText() ) );
+		$titleLink = $this->getLinkRenderer()->makeKnownLink( $title, $visibleTitle );
 		$docTitleLink = $this->getLinkRenderer()->makeKnownLink( $docTitle, 'doc' );
 
 		$titleStr = "<div class='title-link'><span>{$titleLink}</span> ($editLink) / <span>$docTitleLink</span></div>";

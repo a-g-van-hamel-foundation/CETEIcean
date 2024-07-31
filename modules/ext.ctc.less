@@ -17,13 +17,16 @@ tei-teiheader {
 }
 
 tei-head {
-    display: block;
+  display: block;
 }
 tei-TEI tei-head {
 	font-family: "EB Garamond", serif;
 }
-tei-body > tei-head {
-	text-indent: 0em; // restore
+
+// Restore?
+tei-body > tei-head,
+tei-div > tei-head {
+	text-indent:0;
 }
 
 tei-TEI tei-title {
@@ -37,7 +40,10 @@ tei-rubric {
 }
 
 *[rend="italic"] { font-style:italic; }
+*[rend="ital"] { font-style:italic; }
 *[rend="underline"] { font-decoration:underline; }
+*[rend="superscript"] { font-variant:super; }
+*[rend="subscript"] { font-variant:sub; }
 
 tei-div[type="section"], tei-div[type="excerpt"] {
    display:block;
@@ -376,4 +382,8 @@ tei-cit[type="tei-excerpt-col"] {
   padding: .2rem 0 .2rem 1rem;
   display: none;
   overflow: hidden;
+}
+
+tei-choice tei-sic {
+   text-decoration: line-through;
 }

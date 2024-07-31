@@ -18,3 +18,4 @@ $namespaceNames['en'] = [
 	NS_CETEI => 'Cetei',
 	NS_CETEI_TALK => 'Cetei_talk',
 ];
+

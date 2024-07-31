@@ -96,6 +96,12 @@ var configCustomBehaviors = {
 				var p = document.createElement("template");
 				p.innerHTML = createCollapsibleNote( elt, "end" );
 				return p.content;
+			}],
+			["tei-notegrp > tei-note[n]", function(elt) {
+				var p = document.createElement("template");
+				var numberStr = '<sup>[' + elt.getAttribute("n") + "]</sup> ";
+				p.innerHTML = numberStr + elt.innerHTML;
+				return p.content;
 			}]
 		],
 		"div": [

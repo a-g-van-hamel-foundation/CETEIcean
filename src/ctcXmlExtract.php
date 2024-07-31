@@ -137,6 +137,9 @@ class ctcXmlExtract {
 	 * @return string
 	 */
 	public static function removeAllTagPairs( $tagInstancesStr, $allTagNames ) {
+		// Set a hard time limit to prevent execution from hanging indefinitely.
+		set_time_limit( 60 );
+
 		$str = $tagInstancesStr;
 		$newStr = $prev = "";
 		do {
@@ -165,7 +168,7 @@ class ctcXmlExtract {
 	}
 
 	/**
-	 * At this point we should have removed any legitimate tag from our picture
+	 * At this point we should have removed any legitimate tag from our picture.
 	 * @param string $str
 	 * @return array
 	 **/

@@ -1,59 +1,99 @@
 <?php
+
 namespace Ctc\Core;
 
 /**
  * Methods for converting between XML, PHP arrays and HTML output
- * Reads, extracts and modifies XML
+ * Reads, extracts and modifies XML.
  */
 
 use MediaWiki\MediaWikiServices;
 
 class ctcXmlProc {
 
+	public $errorMsg = "";
+	
+	/**
+	 * @todo print errors to designated area
+	 * @todo maybe convert to dynamic function
+	 * @return SimpleXMLElement|bool
+	 */
 	private static function getSimpleXML( $xmlString, $nsprefix = "ctc" ) {
-			$xml = simplexml_load_string( $xmlString, 'SimpleXMLElement' );
+		$useErrors = libxml_use_internal_errors( true );
+		$xml = simplexml_load_string( $xmlString, 'SimpleXMLElement' );
 			// @todo maybe or die("Error: Cannot create object");
-			if ( $xml == false ) {
-				return false;
+		if ( $xml === false ) {
+			foreach (libxml_get_errors() as $error) {
+				$message = "<div>line " . $error->line . ". " . $error->message . "</div>";
+				// this->errorMsg .= $message;
+				print_r( $message );
 			}
-			$xml->registerXPathNamespace( $nsprefix, "http://www.tei-c.org/ns/1.0");
-			return $xml;
+			libxml_clear_errors();
+			return false;
+		}
+		$xml->registerXPathNamespace( $nsprefix, "http://www.tei-c.org/ns/1.0");
+		return $xml;
 	}
 
+	/**
+	 * Get the full SimpleXMLElement
+	 * @return SimpleXMLElement|bool
+	 */
 	public static function getFullXML( $xmlString, $nsprefix = "ctc" ) {
 		$xml = self::getSimpleXML( $xmlString, $nsprefix );
 		return $xml;
 	}
 
+	/**
+	 * Fetch the title from the TEI Header.
+	 * @todo concat multiple titles if available
+	 * @return string|bool
+	 */
 	public function getHeaderTitle( $xmlString ) {
-			$xml = self::getSimpleXML( $xmlString );
-			$headerTitle = $xml->xpath("//ctc:teiHeader//ctc:title");
-			if ( count($headerTitle) > 0 ) {
-				foreach ($headerTitle as $title) {
-						$value = strip_tags( $title->asXml() );
-						return $value;
-					}
-				} else {
-					return false;
-			}
-	}
-
-	/* Returns an array */
-	public static function getExcerpts( $xmlString, $selector = "//ctc:p[@n='2']" ) {
-			$xml = self::getSimpleXML( $xmlString );
-			$selectionArr = $xml->xpath( $selector );
-			if ( $selectionArr !== null && $selectionArr !== 'undefined' ) {
-				return $selectionArr;
-			} else {
-				return false;
-			}
-	}
-
-	/* Returns true/false depending on presence of TEI Header */
-	public function hasTEIHeader( $xmlString ) {
 		$xml = self::getSimpleXML( $xmlString );
-		$teiHeader = $xml->xpath("//ctc:teiHeader");
-		if ( count($teiHeader) > 0 ) {
+		if ( $xml == false ) {
+			return false;
+		}
+		$headerTitle = $xml->xpath("//ctc:teiHeader//ctc:title");
+		if ( count($headerTitle) > 0 ) {
+			foreach ($headerTitle as $title) {
+				$value = strip_tags( $title->asXml() );
+				// return the first title only.
+				return $value;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Get excerpt from XML string.
+	 * @return array|false
+	 */
+	public static function getExcerpts( $xmlString, $selector = "//ctc:p[@n='2']" ) {
+		$xml = self::getSimpleXML( $xmlString );
+		if ( $xml == false ) {
+			return false;
+		}
+		$selectionArr = $xml->xpath( $selector );
+		if ( $selectionArr !== null && $selectionArr !== 'undefined' ) {
+			return $selectionArr;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Returns true/false depending on presence of TEI Header
+	 * @return bool
+	 */
+	public function hasTEIHeader( $xmlString ): bool {
+		$xml = self::getSimpleXML( $xmlString, "ctc" );
+		if ( $xml == false ) {
+			return false;
+		}
+		$teiHeader = $xml->xpath( "//ctc:teiHeader" );
+		if ( gettype($teiHeader) == 'array' && count( $teiHeader ) > 0 ) {
 			return true;
 		} else {
 			return false;
