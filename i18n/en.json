@@ -24,6 +24,7 @@
 	"cetei-tabheader-2": "About",
 	"cetei-tabheader-3": "Source code",
 	"cetei-top-right-content": "<div></div>",
+	"cetei-not-public": "This page is not currently public. It may still be in progress or the creator of this page does not wish to make it available (yet).",
 	"cetei-credits-bottom": "TEI XML document rendered with [https://github.com/TEIC/CETEIcean CETEIcean], v. {{int:ceteicean-lib-version}}.",
 	"cetei-default-content": "<TEI id=\"\" xmlns=\"http://www.tei-c.org/ns/1.0\">\n<teiHeader>\n\t<fileDesc>\n\t\t<titleStmt>\n\t\t<title></title>\n\t\t</titleStmt>\n\t</fileDesc>\n</teiHeader>\n<text>\n<body>\n\n</body>\n</text>\n</TEI>",
 	"ceteiceansearch": "Search TEI XML content",

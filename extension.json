@@ -1,6 +1,6 @@
 {
 	"name": "CETEIcean",
-	"version": "0.6-alpha",
+	"version": "0.7",
 	"type": "parserhook",
 	"author": [
 		"[https://github.com/hcayless Hugh Cayless] and [https://github.com/raffazizzi Raffaele Viglianti] (library creators)",
@@ -34,44 +34,36 @@
 			"i18n"
 		]
 	},
-	"AutoloadClasses": {
-		"ctcHooks": "src/ctcHooks.php",
-		"ctcContentHandler": "src/ctcContentHandler.php",
-		"ctcContent": "src/ctcContent.php",
-		"ctcRender": "src/ctcRender.php",
-		"ctcParserFunctions": "src/ctcParserFunctions.php",
-		"ctcParserFunctionsInfo": "src/ctcParserFunctionsInfo.php",
-		"ctcAlign": "src/ctcAlign.php",
-		"ctcTabWidget": "src/ctcTabWidget.php",
-		"ctcXmlProc": "src/ctcXmlProc.php",
-		"ctcUtils": "src/ctcUtils.php",
-		"ctcXmlExtract": "src/ctcXmlExtract",
-		"ctcSpecialPage": "src/special/ctcSpecialPage.php",
-		"ctcSpecialUtils": "src/special/ctcSpecialUtils.php"
-	},
 	"AutoloadNamespaces": {
 		"Ctc\\Core\\": "src/",
-		"Ctc\\Special\\": "src/special"
+		"Ctc\\Content\\": "src/Content/",
+		"Ctc\\Process\\": "src/Process/",
+		"Ctc\\ParserFunctions\\": "src/ParserFunctions",
+		"Ctc\\Special\\": "src/Special/"
+	},
+	"AutoloadClasses": {
+		"ctcHooks": "src/ctcHooks.php",
+		"ctcUtils": "src/ctcUtils.php"
 	},
 	"ExtensionMessagesFiles": {
 		"ctcMagic": "ctc.i18n.php",
-		"ctcNamespaces": "ctc.i18n.namespaces.php"
+		"ctcNamespaces": "ctc.i18n.namespaces.php",
+		"ctcAliases": "ctc.i18n.aliases.php"
 	},
 	"Hooks": {
-		"AdminLinks": [
-			"ctcHooks::addToAdminLinks"
-		],
-		"CodeEditorGetPageLanguage": "ctcHooks::onCodeEditorGetPageLanguage",
+		"Register": [ "ctcHooks::onRegister" ],
 		"BeforePageDisplay": [ "ctcHooks::onBeforePageDisplay" ],
 		"ParserFirstCallInit": [ "ctcHooks::onParserFirstCallInit" ],
-		"Register": [  "ctcHooks::onRegister" ],
+		"HtmlPageLinkRendererBegin": "ctcHooks::onHtmlPageLinkRendererBegin",
 		"ContentHandlerDefaultModelFor": [ "ctcHooks::contentHandlerDefaultModelFor" ],
 		"ParserAfterTidy": [ "ctcHooks::disableParserCache" ],
 		"ResourceLoaderGetConfigVars": [ "ctcHooks::onResourceLoaderGetConfigVars" ],
-		"SpecialSearchProfiles": "ctcHooks::onSpecialSearchProfiles"
+		"SpecialSearchProfiles": "ctcHooks::onSpecialSearchProfiles",
+		"CodeEditorGetPageLanguage": "ctcHooks::onCodeEditorGetPageLanguage",
+		"AdminLinks": [ "ctcHooks::addToAdminLinks" ]
 	},
 	"ContentHandlers": {
-		"cetei": "Ctc\\Core\\ctcContentHandler"
+		"cetei": "Ctc\\Content\\ctcContentHandler"
 	},
 	"ResourceFileModulePaths": {
 		"localBasePath": "modules",
@@ -210,7 +202,6 @@
 				"worker-xml.js"
 			]
 		},
-
 		"ext.highlight": {
 			"localBasePath": "modules",
    			"remoteExtPath": "CETEIcean/modules",
@@ -224,7 +215,7 @@
 		},
 		"ext.highlight.lib": {
 			"localBasePath": "modules/lib-highlight-xml",
-   			"remoteExtPath": "CETEIcean/modules/lib-highlight-xml",
+			"remoteExtPath": "CETEIcean/modules/lib-highlight-xml",
 			"packageFiles": [
 				"highlight.min.js"
 			]
@@ -259,6 +250,18 @@
 		"CeteiAllowUrl": {
 			"value": false,
 			"description": "Whether or not to allow URLs with the parser function."
+		},
+		"CeteiAboutSectionTemplate": {
+			"value": false,
+			"description": "The wiki template to be used in the 'About' section. This allows any additional content such as metadata to be shown, such as data you may have stored in a content slot. Previously, the only option was to use a subpage (/doc)."
+		},
+		"CeteiMetadataSlot": {
+			"value": false,
+			"description": ""
+		},
+		"CeteiPublicationCheck": {
+			"value": false,
+			"description": "Array with the keys 'smwProperty', 'valueIfPublic', 'valueIfPrivate' "
 		}
 	},
 	"ConfigRegistry": {

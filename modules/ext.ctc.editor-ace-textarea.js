@@ -1,11 +1,12 @@
 /**
  * ext.ctc.editor-textarea.js
  * Adds the Ace editor to textareas with class=ace-editor
- * Parser function required for init
+ * Parser function required for init.
+ * Not to be confused with Ace + CodeEditor
  */
 
 $(document).ready(function(){
-
+	
 	const aceEditors = document.querySelectorAll( ".ace-editor" );
 
 	/**
@@ -30,7 +31,7 @@ $(document).ready(function(){
 		ace.config.set( 'basePath', basePath + '/CodeEditor/modules/ace' );
 		var aceEditor = ace.edit( aceTextarea );
 		var XmlMode = ace.require("ace/mode/xml").Mode;
-		// console.log( 'Ace initialised...' + index  );
+		//console.log( 'Ace initialised...' + index  );
 			//aceEditor.setTheme( 'ace/theme/clouds' );
 			//var XmlMode = ace.require("ace/mode/xml").Mode;
 			//import jsonWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-json";
@@ -56,6 +57,26 @@ $(document).ready(function(){
 		});
 		origTextarea.value = aceEditor.getSession().getValue();
 
+		// Keyboard shortcut to add expan tags
+		// A similar feature is in ext.ctc.editor.js
+		aceEditor.container.addEventListener('keydown', function(e) {
+			if (e.metaKey && e.key === 'i') {
+				e.preventDefault();
+				const selected = aceEditor.getSelectedText();
+				if ( selected !== "" ) {
+					console.log( selected );
+					var newVal = "<expan>" + selected + "</expan>";
+					aceEditor.session.replace( aceEditor.selection.getRange(), newVal );
+					//aceEditor.session.insert( aceEditor.getCursorPosition(), newVal );
+					var newVal = "";
+				}
+			}
+		});
+
+		aceEditor.session.setUseWrapMode(true);
+		// aceEditor.getSession().doc.getTextRange( aceEditor.selection.getRange() );
+		// aceEditor.getSelectedText()
+
 		// Finally, make aceEditor resizable
 		resizeEditor( aceEditor );
 
@@ -71,6 +92,11 @@ $(document).ready(function(){
 		onresize( resizableEl, function () {
 			aceEditor.resize();
 		});
+	}
+
+	function onSelectDoStuff() {
+		// editor.getSelectedText() 
+
 	}
 	
 	// Copied from CodeEditor extension

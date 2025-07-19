@@ -1,11 +1,19 @@
 <?php
 
-use MediaWiki\MediaWikiServices;
-use MediaWiki\OutputPage;
-use MediaWiki\ParserOutput;
-use MediaWiki\PPFrame;
-use Ctc\Core\ctcRender;
-use Ctc\Core\ctcParserFunctions;
+//namespace Ctc\Core;
+
+//use MediaWiki\Linker\Hook\HtmlPageLinkRendererBeginHook;
+
+//use Parser;
+//use Title;
+//use RequestContext;
+//use Config;
+//use HtmlArmor;
+//use ExtensionRegistry;
+	// use ALTree, ALSection, ALRow;
+use Ctc\Content\ctcRender;
+use Ctc\Special\ctcSpecialUtils;
+use Ctc\Content\SMWUtils;
 
 class ctcHooks {
 
@@ -46,7 +54,7 @@ class ctcHooks {
 	 * Content model XML default in NS_CETEI NS, except for /doc pages
 	 */
 	public static function contentHandlerDefaultModelFor( Title $title, &$model ) {
-		$isDoc = ctcRender::isDocPage( $title );
+		$isDoc = ctcRender::isDocPage( $title->getPrefixedText() );
 		$nameSpace = $title->getNamespace();
 		if ( $nameSpace === NS_CETEI && $isDoc !== true ) {
 			$model = CONTENT_MODEL_XML;
@@ -63,8 +71,9 @@ class ctcHooks {
 	 * @link https://github.com/wikimedia/mediawiki-extensions-CodeEditor/blob/master/includes/Hooks/HookRunner.php
 	 **/
 	public static function onCodeEditorGetPageLanguage( Title $title, &$lang ) {
-		$isDoc = ctcRender::isDocPage( $title );
-		if ( $title->getNamespace() === NS_CETEI && $isDoc !== true ) {
+		$pageTitle = $title->getPrefixedText();
+		$isDoc = ctcRender::isDocPage( $pageTitle );
+		if ( !$isDoc && $title->getNamespace() === NS_CETEI ) {
 			$lang = 'xml';
 			//return false;
 		}
@@ -76,15 +85,10 @@ class ctcHooks {
 	 **/
 	public static function onParserFirstCallInit( Parser $parser ) {
 		// Register any render callbacks with the parser
-		$name = 'cetei';
-		$functionCallback = [ 'Ctc\Core\ctcParserFunctions', 'runCeteiPF' ];
-		$flags = \Parser::SFH_OBJECT_ARGS;
-		$parser->setFunctionHook( $name, $functionCallback, $flags );
-
-		$parser->setFunctionHook( 'cetei-align', [ 'Ctc\Core\ctcParserFunctions', 'runCeteiAlignPF' ], $flags );
-
-		$parser->setFunctionHook( 'cetei-ace', [ 'Ctc\Core\ctcParserFunctions', 'runCeteiAcePF' ], $flags );
-
+		$flags = Parser::SFH_OBJECT_ARGS;
+		$parser->setFunctionHook( 'cetei', [ 'Ctc\ParserFunctions\ctcParserFunctions', 'runCeteiPF' ], $flags );
+		$parser->setFunctionHook( 'cetei-align', [ 'Ctc\ParserFunctions\ctcParserFunctions', 'runCeteiAlignPF' ], $flags );
+		$parser->setFunctionHook( 'cetei-ace', [ 'Ctc\ParserFunctions\ctcParserFunctions', 'runCeteiAcePF' ], $flags );
 		return true;
 	}
 
@@ -98,7 +102,7 @@ class ctcHooks {
 		return true;
 	}
 
-	/**  
+	/**
 	 * w/ ParserAfterTidy
 	 */
 	public static function disableParserCache( Parser &$parser, string &$text ) {
@@ -108,8 +112,8 @@ class ctcHooks {
 		}
 	}
 
-	public static function onSpecialSearchProfiles( &$searchprofles ) {
-		Ctc\Special\ctcSpecialUtils::customiseSearchProfiles( $searchprofles );
+	public static function onSpecialSearchProfiles( &$searchprofiles ) {
+		ctcSpecialUtils::customiseSearchProfiles( $searchprofiles );
 	}
 
 	/**
@@ -150,6 +154,37 @@ class ctcHooks {
 			)
 		);
 		return true;
+	}
+
+	/**
+	 * Make sure the display title sticks to page links
+	 */
+	public static function onHtmlPageLinkRendererBegin( $linkRenderer, $linkTarget, &$text, &$customAttribs, &$query, &$ret ) {
+		// Only if namespace = Cetei and not a /doc subpage
+		$requestContext = RequestContext::getMain();
+		$title = $requestContext->getTitle();
+		if ( $title && $title->canExist() && $title->getNamespace() === NS_CETEI ) {			
+			$isDoc = ctcRender::isDocPage( $title );
+			if ( !$isDoc ) {
+				if ( $text instanceof HtmlArmor ) {
+					// this shouldn't have happened
+					$textCompared = HtmlArmor::getHtml( $text );
+				} else {
+					$textCompared = trim( $text );
+				}
+				$displayTitle = $requestContext->getOutput()->getDisplayTitle();
+				if ( $textCompared == $displayTitle ) {
+					// skip
+					$text = $displayTitle;
+				} elseif( $textCompared == $title->getText()
+				|| $textCompared == $title->getPrefixedText() ) {
+					$text = $displayTitle;
+				} else {
+					// Do nothing, assuming the link label has 
+					// been customised
+				}
+			}
+		}
 	}
 
 }

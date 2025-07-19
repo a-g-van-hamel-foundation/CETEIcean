@@ -1,23 +1,23 @@
 .ns-350 .mw-body .firstHeading {
-  //font-size: 1rem;
-  //text-transform: uppercase;
-  //letter-spacing: .1rem;
-  //font-family: var(--font-family-sans-serif);
+	//font-size: 1rem;
+	//text-transform: uppercase;
+	//letter-spacing: .1rem;
+	//font-family: var(--font-family-sans-serif);
 }
 
 /* CUSTOM */
 tei-teiheader {
-  display: block;
-  margin-top: 2em;
-  margin-bottom: 2em;
-  tei-listperson > * {
-    display:list-item;
-    margin: 0 0 0.1rem 1rem;
-  }
+	display: block;
+	margin-top: 2em;
+	margin-bottom: 2em;
+	tei-listperson > * {
+		display:list-item;
+		margin: 0 0 0.1rem 1rem;
+	}
 }
 
 tei-head {
-  display: block;
+	display: block;
 }
 tei-TEI tei-head {
 	font-family: "EB Garamond", serif;
@@ -30,10 +30,10 @@ tei-div > tei-head {
 }
 
 tei-TEI tei-title {
-  //font-size: larger;
+	//font-size: larger;
 }
 *[lemma] {
-  font-weight:bold;
+	font-weight:bold;
 }
 tei-rubric {
 	color:darkred;
@@ -46,31 +46,31 @@ tei-rubric {
 *[rend="subscript"] { font-variant:sub; }
 
 tei-div[type="section"], tei-div[type="excerpt"] {
-   display:block;
+	 display:block;
 }
 tei-div[type="excerpt"] {
-  margin-bottom: 1rem;
+	margin-bottom: 1rem;
 }
 tei-div[n],
 tei-div1[n],
 tei-div2[n],
 tei-div[type="section"][n] {
-  display:flex;
-  align-items: baseline;
-  tei-p {
-    margin-top: 0;
-  }
+	display:flex;
+	align-items: baseline;
+	tei-p {
+		margin-top: 0;
+	}
 }
 /* Removed in 0.5
 tei-div[type="section"]:before {
-    content: attr(n);
-    color: #777;
-    display: inline;
-    position: absolute;
-    width:3em; // make sure that three-digit numbers fit and are aligned to the right
-    left: -3em;
-    top: auto;
-    text-align:right;
+		content: attr(n);
+		color: #777;
+		display: inline;
+		position: absolute;
+		width:3em; // make sure that three-digit numbers fit and are aligned to the right
+		left: -3em;
+		top: auto;
+		text-align:right;
 }
 */
 
@@ -81,9 +81,9 @@ tei-div1[n] {
 }
 tei-div1[n]::before {
 	content: attr(n);
-    color: #777;
-    display: inline-block;
-    position: absolute;
+		color: #777;
+		display: inline-block;
+		position: absolute;
 	left:-1em;
 	top:auto;
 	padding-right: 12px;
@@ -91,40 +91,40 @@ tei-div1[n]::before {
 */
 
 tei-additions::before {
-    //content: "Significant additions within the document: ";
-    color:#777;
+		//content: "Significant additions within the document: ";
+		color:#777;
 }
 tei-expan, tei-ex {
-    font-style: italic;
+		font-style: italic;
 }
 /* Previous
 tei-l {
-    display: block;
-    padding-left: 5em;
-    text-indent: -2em;
-    position: relative;
-    max-width: 35em;
-    width: 100%;
+		display: block;
+		padding-left: 5em;
+		text-indent: -2em;
+		position: relative;
+		max-width: 35em;
+		width: 100%;
 }
 */
 tei-l {
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    //padding-left: 5em;
-    //text-indent: -2em;
-    position: relative;
-    max-width: 35em;
-    width: 100%;
+		display: flex;
+		flex-direction: row;
+		align-items: baseline;
+		//padding-left: 5em;
+		//text-indent: -2em;
+		position: relative;
+		max-width: 35em;
+		width: 100%;
 }
 
 /* see Buile Shuibhne - forces line number to precede tei-l on the same line */
 tei-lg tei-lb {
-  display: block !important;
-  //content: '';
-  position: absolute;
-  top: auto;
-  left: auto;
+	display: block !important;
+	//content: '';
+	position: absolute;
+	top: auto;
+	left: auto;
 }
 
 tei-ps, tei-persname, tei-persName,
@@ -132,8 +132,8 @@ tei-fn, tei-foreName {
 	font-weight:bold;
 }
 tei-pn, tei-placeName {
-  font-weight:bold;
-  color: #754C5F;
+	font-weight:bold;
+	color: #754C5F;
 }
 tei-gloss {
 	color:darkred;
@@ -155,21 +155,32 @@ tei-front {
 	font-size:0.9em;
 }
 tei-front {
-  display:block;
-  margin-bottom:1.2rem;
+	display:block;
+	margin-bottom:1.2rem;
+}
+
+/* Breaks (line, etc.) - see also tei-lg */
+// By default do not render line breaks as such
+tei-lb {
+	display:none;
 }
 tei-lb[n] {
 	display:inline;
 }
+tei-lb::after {
+	// override
+	display:inline;
+	content: none;
+}
 tei-p tei-lb::before {
-  content: ' ';
+	// content: ' ';
 }
 tei-lb[n]::after {
 	content: '';
 }
 tei-cb::before {
-    content: "[col. " attr(n) "]";
-    color: #777;
+		content: "[col. " attr(n) "]";
+		color: #777;
 }
 /* frn is used on older sites like CELT */
 tei-foreign, tei-frn {
@@ -178,171 +189,171 @@ tei-foreign, tei-frn {
 
 /** Behaviours **/
 .tei-number {
-  //display: inline-block;
-  width: 100%;
-  max-width: 2rem;
-  color: grey;
-  padding-right: 5px;
-  font-size: smaller;
-  &.tei-number-wide {
-    max-width:5rem;
-  }
+	//display: inline-block;
+	width: 100%;
+	max-width: 2rem;
+	color: grey;
+	padding-right: 5px;
+	font-size: smaller;
+	&.tei-number-wide {
+		max-width:5rem;
+	}
 }
 .tei-number.line-number {
-  color: grey;
-  text-align: right;
-  padding-right: 1em;
+	color: grey;
+	text-align: right;
+	padding-right: 1em;
 }
 .tei-number.line-break-number {
-  color: grey;
-  font-size:0.8em;
+	color: grey;
+	font-size:0.8em;
 }
 .tei-number.line-break-number:before {
-  content: '[';
+	content: '[';
 }
 .tei-number.line-break-number:after {
-  content: ']';
+	content: ']';
 }
 .tei-number.line-break-number:empty {
-  display:none;
+	display:none;
 }
 .tei-number.line-group-number {
-  color:#a93737;
+	color:#a93737;
 }
 .tei-number.paragraph-number {
-  color: teal;
+	color: teal;
 }
 tei-body tei-head {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: .6em;
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-bottom: .6em;
 }
 
 /* Unhide header elements when embedded in header context */
 #cetei-header tei-sourceDesc,
 #cetei-header tei-encodingdesc,
 #cetei-header tei-publicationStmt > * {
-  display:block;
+	display:block;
 }
 
 /* Spinner before content is ready */
 .spinner-dual-ring {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
+	display: inline-block;
+	width: 80px;
+	height: 80px;
 }
 .spinner-dual-ring:after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6px solid #999;
-  border-color: #999 transparent #999 transparent;
-  animation: spinner-dual-ring 1.2s linear infinite;
+	content: " ";
+	display: block;
+	width: 64px;
+	height: 64px;
+	margin: 8px;
+	border-radius: 50%;
+	border: 6px solid #999;
+	border-color: #999 transparent #999 transparent;
+	animation: spinner-dual-ring 1.2s linear infinite;
 }
 @keyframes spinner-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 .cetei-add {
-  color:#592121;
-  font-size:.85em;
+	color:#592121;
+	font-size:.85em;
 }
 /* quotes */
 tei-said {
-  color:#414141;
+	color:#414141;
 }
 .cetei-said {
-  //color: teal;
-  color: #414141;
-  font-weight: bold;
+	//color: teal;
+	color: #414141;
+	font-weight: bold;
 }
 tei-said tei-said .cetei-said {
-  color: darkred;
+	color: darkred;
 }
 
 
 .cetei-alert {
-  color: #0c5460;
-  background: #d1ecf1 linear-gradient(180deg,#d8eff3,#d1ecf1) repeat-x;
-  padding: 0.75rem 1.25rem;
-  margin-bottom: 1rem;
-  border-radius: 0.25rem;
-  border:1px solid #bee5eb;
+	color: #0c5460;
+	background: #d1ecf1 linear-gradient(180deg,#d8eff3,#d1ecf1) repeat-x;
+	padding: 0.75rem 1.25rem;
+	margin-bottom: 1rem;
+	border-radius: 0.25rem;
+	border:1px solid #bee5eb;
 }
 
 .ctc-icon {
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: normal;
+	display: inline-flex;
+	align-items: baseline;
+	justify-content: normal;
 }
 .ctc-icon::before {
-  content: '';
-  font-size:inherit;
-  background-repeat: no-repeat;
-  background-size: 100%;
-  width: 1em;
-  height: 1em;
+	content: '';
+	font-size:inherit;
+	background-repeat: no-repeat;
+	background-size: 100%;
+	width: 1em;
+	height: 1em;
 }
 
 /* Special page */
 .cetei-specialpage-header .cetei-item {
-  margin-bottom: .6em;
-  display: flex;
-  width: 100%;
-  @media (max-width: 670px) {
-    flex-wrap:wrap;
-  }
-  .label {
-    font-weight:bold;
-    display: block;
-    min-width: 10rem;
-    text-align: left;
-    font-size:1rem;
-    padding:0 .2rem 0 0;
-    line-height: inherit;
-  }
-  .description {
-    display: block;
-    width: 100%;
-    text-align: left;
-    font-size:1rem;
-    line-height: inherit;
-  }
+	margin-bottom: .6em;
+	display: flex;
+	width: 100%;
+	@media (max-width: 670px) {
+		flex-wrap:wrap;
+	}
+	.label {
+		font-weight:bold;
+		display: block;
+		min-width: 10rem;
+		text-align: left;
+		font-size:1rem;
+		padding:0 .2rem 0 0;
+		line-height: inherit;
+	}
+	.description {
+		display: block;
+		width: 100%;
+		text-align: left;
+		font-size:1rem;
+		line-height: inherit;
+	}
 }
 .cetei-specialpage-result {
-  width: 100%;
-  .title-link {
-    display:block;
-  }
-  .details {
-    font-size: smaller;
-    display:flex;
-    font-style:italic;
-    & > * {
-      margin-right:.4rem;
-    }
-  }
+	width: 100%;
+	.title-link {
+		display:block;
+	}
+	.details {
+		font-size: smaller;
+		display:flex;
+		font-style:italic;
+		& > * {
+			margin-right:.4rem;
+		}
+	}
 }
 
 //
 .cetei-instance {
-  &.cetei-rendering {
-    opacity:0 !important;
-    //visibility:hidden;
-  }
-  &.cetei-rendered {
-    opacity: 1;
-    transition: opacity 0.15s ease-in-out;
-    //visibility:visible;
-  }
+	&.cetei-rendering {
+		opacity:0 !important;
+		//visibility:hidden;
+	}
+	&.cetei-rendered {
+		opacity: 1;
+		transition: opacity 0.15s ease-in-out;
+		//visibility:visible;
+	}
 }
 
 /* cetei-align */
@@ -352,38 +363,52 @@ tei-said tei-said .cetei-said {
 }
 
 tei-cit[type="tei-excerpt-col"] {
-  padding: 1rem;
-  flex-basis: 0;
-  flex-grow: 1;
-  max-width: 100%;
-  @media screen and (max-width: 768px) {
-    padding: .7rem;
-    flex-basis: max-content;
-  }
+	padding: 1rem;
+	flex-basis: 0;
+	flex-grow: 1;
+	max-width: 100%;
+	@media screen and (max-width: 768px) {
+		padding: .7rem;
+		flex-basis: max-content;
+	}
 }
 
 // Collapsible
 .tei-anchor-collapsible {
-  cursor: pointer;
-  padding:2px;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: .8rem;
-  color:red;
+	cursor: pointer;
+	padding:2px;
+	border: none;
+	text-align: left;
+	outline: none;
+	font-size: .8rem;
+	color:red;
 }
 .tei-anchor-collapsible.active,
 .tei-anchor-collapsible:hover {
-  background-color:lightgrey;
+	background-color:lightgrey;
 }
 .tei-note-collapsible {
-  border-left: 2px solid #977b51;
-  font-size: .9rem;
-  padding: .2rem 0 .2rem 1rem;
-  display: none;
-  overflow: hidden;
+	border-left: 2px solid #977b51;
+	font-size: .9rem;
+	padding: .2rem 0 .2rem 1rem;
+	display: none;
+	overflow: hidden;
 }
 
 tei-choice tei-sic {
-   text-decoration: line-through;
+	 text-decoration: line-through;
+}
+
+tei-gap:before {
+	content: "...";
+}
+
+tei-unclear {
+	text-underline-position: under;
+	text-underline-offset: auto;
+	text-decoration: underline;
+	text-decoration-color: currentcolor;
+	text-decoration-style: solid;
+	text-decoration-style: wavy;
+	text-decoration-color: red;
 }

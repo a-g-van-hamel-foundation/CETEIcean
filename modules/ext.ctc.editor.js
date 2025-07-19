@@ -391,6 +391,35 @@
 			}
 		});
 
+		// A similar feature is in ext.ctc.editor-ace-textarea.js
+		const wikiEditorUI = document.querySelector('.wikiEditor-ui-text');
+		wikiEditorUI.addEventListener('keydown', function(e) {
+			var selection = session.getSelection();
+			var selectedText = session.getTextRange( selection.getRange() );
+			// const selected = aceEditor.getSelectedText();
+			if (e.metaKey && e.key === 'i') {
+				e.preventDefault();
+				var newVal = "<expan>" + selectedText + "</expan>";
+				session.replace( selection.getRange(), newVal );
+			}
+		});
+
+		/*
+		ace.container.addEventListener('keydown', function(e) {
+			if (e.metaKey && e.key === 'i') {
+				e.preventDefault();
+				const selected = session.getSelectedText();
+				if ( selected !== "" ) {
+					console.log( selected );
+					var newVal = "<expan>" + selected + "</expan>";
+					session.replace( session.selection.getRange(), newVal );
+					//aceEditor.session.insert( aceEditor.getCursorPosition(), newVal );
+					var newVal = "";
+				}
+			}
+		});
+		*/
+
 		/**
 		 * Check for annotations that are either errors or warnings
 		 * @param array annotations
@@ -411,8 +440,24 @@
 
 	/* Invoke and load after initial assets */
 
+	function onSelectDoSomething( $textBox ) {
+		const wikiEditorUI = document.querySelector('.wikiEditor-ui-text');
+		//console.log( myTextBox );
+		wikiEditorUI.addEventListener( "select", function(event) {
+			//console.log( event.target.value );
+			const selection = event.target.value.substring(
+				event.target.selectionStart,
+				event.target.selectionEnd,
+			);
+			console.log(selection);
+		});
+	}
+	
+
 	$( $textbox1 ).on( 'wikiEditor-toolbar-doneInitialSections', function() {
 			addTEIXMLToWikiEditor( $textbox1 );
+			//onSelectDoSomething( $textbox1 );
+			// document.
 	} );
 
 }( jQuery, mediaWiki ) );

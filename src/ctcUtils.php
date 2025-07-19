@@ -1,15 +1,26 @@
 <?php
+
+/**
+ * Collection of utility methods
+ */
+
 namespace Ctc\Core;
 
 use MediaWiki\MediaWikiServices;
-use MediaWiki\MainConfigNames;
-use MediaWiki\OutputPage;
-use MediaWiki\ParserOutput;
+//use MediaWiki\MainConfigNames;
+//use MediaWiki\OutputPage;
+//use MediaWiki\ParserOutput;
 use MediaWiki\Revision\RevisionRecord;
-
-/**
- * Collection of helper methods
- */
+use OutputPage;
+use RequestContext;
+use Title;
+use MediaWiki\Revision\SlotRecord;
+use WikiPage;
+use TitleValue;
+use ContentHandler;
+use Html;
+use ExtensionRegistry;
+use Ctc\Process\ctcXmlProc;
 
 class ctcUtils {
 
@@ -18,36 +29,44 @@ class ctcUtils {
 	 * Originally part of ctcRender class
 	 * @todo: change hardcoded 'user' to language-independent value?
 	 * @todo: check whether user has editing rights = preferred action
-	*/
-	public static function isUser() {
-		$presentUser = \RequestContext::getMain()->getUser();
+	 * @param RequestContext|null $context
+	 * @return bool
+	 */
+	public static function isUser( $context = null ) {
+		if( $context === null ) {
+			$context = RequestContext::getMain();
+		}
+		$presentUser = $context->getUser();
 		$presentUserGroups = [];
 		$presentUserGroups = MediaWikiServices::getInstance()->getUserGroupManager()->getUserEffectiveGroups( $presentUser );
-		if ( in_array( 'user', $presentUserGroups ) ) {
-			return true;
-		} else {
-			return false;
-		}
+		return in_array( "user", $presentUserGroups ) ? true : false;
 	}
 
 	/**
 	 * Check if TEI page ($title) has an associated /doc subpage 
+	 * @param string|bool $title
+	 * @param OutputPage|null $outputPage
 	 */
-	public static function hasDocPage( $title ) {
+	public static function hasDocPage(
+		mixed $title = false,
+		mixed $outputPage = null
+	) {
+		// page name of /doc page
 		if ( $title ) {
-			$docPageStr = $title . '/doc';
+			$docPageStr = $title . "/doc";
+		} elseif( $outputPage !== null ) {
+			$docPageStr = $outputPage->getTitle() . "/doc";
 		} else {
-			$out = \RequestContext::getMain()->getOutput();
-			$docPageStr = $out->getTitle() . '/doc';
+			$outputPage = RequestContext::getMain()->getOutput();
+			if ( $outputPage === null || $outputPage === false ) {
+				return false;
+			}
+			$docPageStr = $outputPage->getTitle() . "/doc";
 		}
-		$docPageObj = \Title::newFromText( $docPageStr );
-		$docPageID = $docPageObj->getArticleID() ;
-		// if Page ID equals 0, page does not exist
-		if ( $docPageID !== 0 ) {
-			return true;
-		} else {
-			return false;
-		}
+		// Check if it exists. If Page ID=0, page does not exist
+		$docPageObj = Title::newFromText( $docPageStr );
+		$docPageID = $docPageObj->getArticleID();
+		return ( $docPageID !== 0 ) ? true : false;
 	}
 
 	/**
@@ -60,7 +79,7 @@ class ctcUtils {
 		if ( $docType == "wikipage" ) {
 			$text = self::getContentfromTitleStr( $doc, $default );
 		} else if ( $docType == "url" ) {
-			$allowUrl = \RequestContext::getMain()->getConfig()->get( 'CeteiAllowUrl' );
+			$allowUrl = RequestContext::getMain()->getConfig()->get( 'CeteiAllowUrl' );
 			$defaultNoUrl = `<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><p>URLs not allowed.</p></text></TEI>`;
 			$text = ( $allowUrl == true ) ? self::getContentfromUrl( $doc, $default ) : $defaultNoUrl ;
 	   } else {
@@ -70,38 +89,85 @@ class ctcUtils {
 	}
 
 	/** 
-	 * Utility - accept title (string) and return fulltext content
-	 * Actually belongs to ctcUtils
+	 * Utility - accept title (string) and return full-text content
+	 * Intended for XML content
 	 */
-	public static function getContentfromTitleStr( string $titleStr, string $default = "" ): string {
+	public static function getContentfromTitleStr(
+		string $titleStr,
+		string $default = ""
+	): string {
 		// maybe resolve redirects first?
-		$titleObj = \Title::newFromText( $titleStr );
+		$titleObj = Title::newFromText( $titleStr );
 		if ( $titleObj == null ) {
-			self::printRawText( 'Could not fimd page...' );
+			//self::printRawText( 'Could not find page...' );
 			return $default;
 		}
-		$wikiObj = \WikiPage::factory( $titleObj );
+		$wikiObj = WikiPage::factory( $titleObj );
 		// https://www.mediawiki.org/wiki/Manual:WikiPage.php
 		$wikiContent = $wikiObj->getContent( RevisionRecord::RAW );
 		$text = '';
-		$text = \ContentHandler::getContentText( $wikiContent );
+		$text = ContentHandler::getContentText( $wikiContent );
 
 		/* Important */
-		$ctcXmlProc = new ctcXmlProc();
+		//$ctcXmlProc = new ctcXmlProc();
 		$output = ctcXmlProc::removeDocType( $text );
 
 		return $output;
 	}
 
-	/* Accept URL and return fulltext content */
-	public static function getContentfromUrl( string $url, string $default = "" ): string {
+	/**
+	 * Summary of getRawContentFromTitleObj
+	 * @param Title $titleObj
+	 * @param string $slotName
+	 * @return string|bool
+	 */
+	public static function getRawContentFromTitleObj(
+		Title $titleObj,
+		string $slotName = "main"
+	) {
+		$article = new \Article( $titleObj );
+		//$title = $article->getTitle();
+		$revRecord = MediaWikiServices::getInstance()
+			->getRevisionLookup()
+            ->getRevisionByTitle( $titleObj, $article->getRevIdFetched() );
+		if ( !$revRecord ) {
+			return false;
+		}
+
+		$webRequest = $article->getContext()->getRequest();
+		if ( $slotName === "main" || $slotName === "" ) {
+			// Get normalised name of main slot
+			$slot = $webRequest->getText( "slot", SlotRecord::MAIN );
+		} else {
+			$slot = $slotName;
+		}
+
+		// Ensure we get latest revision
+		$lastmod = wfTimestamp( TS_RFC2822, $revRecord->getTimestamp() );
+		$webRequest->response()->header( "Last-modified: $lastmod" );
+		
+		$content = $revRecord->hasSlot( $slot )
+			? $revRecord->getContent( $slot )
+			: null;
+		return $content !== null
+			? $content->getText()
+			: "";
+	}
+
+	/**
+	 * Accept URL and return fulltext content.
+	 */
+	public static function getContentfromUrl(
+		string $url,
+		string $default = ""
+	): string {
 		//$uri = urlencode( $url );
 		$text = file_get_contents( $url );
 		/* Important */
 		if ( $text == false ) {
 			$output = $default;
 		} else {
-			$ctcXmlProc = new ctcXmlProc();
+			//$ctcXmlProc = new ctcXmlProc();
 			$output = ctcXmlProc::removeDocType( $text );
 		}
 		return $output;
@@ -110,8 +176,7 @@ class ctcUtils {
 	/**
 	 * Unused
 	 */
-	public static function renderLink(
-		\Title $target, $nsprefix, string $pageName, string $label
+	public static function renderLink( Title $target, $nsprefix, string $pageName, string $label
 	) {
 		//$nsprefix = NS_MAIN;
 		$linkRenderer = MediaWikiServices::getInstance()->getLinkRenderer();
@@ -124,9 +189,14 @@ class ctcUtils {
 		return $str;
 	}
 
+	/**
+	 * Checks if either the SyntaxHighlight extension or 
+	 * highlight.js integration is installed.
+	 * @return bool
+	 */
 	public static function isSyntaxHighlightAvailable(): bool {
-		$registry = \ExtensionRegistry::getInstance();
-		if ( $registry->isLoaded( 'SyntaxHighlight' ) == true || $registry->isLoaded( 'highlight.js integration' ) == true ) {
+		$registry = ExtensionRegistry::getInstance();
+		if ( $registry->isLoaded( "SyntaxHighlight" ) == true || $registry->isLoaded( "highlight.js integration" ) == true ) {
 			return true;
 		}
 		return false;
@@ -136,7 +206,7 @@ class ctcUtils {
 	 * Converts array to JSON string to be displayed on the wiki.
 	 */
 	public static function showArrayAsJsonInWikiText( array $arr ): string {
-		$registry = \ExtensionRegistry::getInstance();
+		$registry = ExtensionRegistry::getInstance();
 		if ( $registry->isLoaded( 'SyntaxHighlight' ) == true || $registry->isLoaded( 'highlight.js integration' ) == true )  {
 			$str = "<syntaxhighlight lang='json'>" . json_encode( $arr, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "</syntaxhighlight>";
 		} else {
@@ -149,20 +219,23 @@ class ctcUtils {
 	 * @deprecated
 	 */
 	public static function getTemporarySpinner() {
-		$tempSpinner = \Html::element( 'span', [
-			'class' => 'spinner-dual-ring'
-		], '' );
-		return $tempSpinner;
+		return Html::element( "span", [ "class" => "spinner-dual-ring" ], "" );
 	}
 
 	/**
 	 * Convenience methods for testing in development only.
+	 * @internal
 	 */
 	public static function printArray( $arr ) {
 		print_r( "<pre>" );
 		print_r( $arr );
 		print_r( "</pre>" );
 	}
+	/**
+	 * @internal
+	 * @param mixed $str
+	 * @return void
+	 */
 	public static function printRawText( $str ) {
 		print_r( "<pre>" );
 		print_r( htmlspecialchars($str) );

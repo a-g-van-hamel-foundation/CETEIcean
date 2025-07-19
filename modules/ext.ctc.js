@@ -6,7 +6,8 @@
 if ( mw.config.exists( 'wgCeteiBehaviorsJsFile' ) == true ) {
 	var customBehaviorsFile = mw.config.get( 'wgCeteiBehaviorsJsFile' );
 } else {
-  var customBehaviorsFile = '/extensions/CETEIcean/modules/ext.ctc.behaviors.js';
+	var basePath = mw.config.get( 'wgExtensionAssetsPath', '' );
+	var customBehaviorsFile = basePath + '/CETEIcean/modules/ext.ctc.behaviors.js';
 }
 
 mw.loader.getScript( customBehaviorsFile ).then( function () {

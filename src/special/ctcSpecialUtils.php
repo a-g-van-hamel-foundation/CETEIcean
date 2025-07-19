@@ -1,18 +1,21 @@
 <?php
+
 /**
  *
  * @author: Dennis Groenewegen
  * @file
  * @ingroup
  */
+
 namespace Ctc\Special;
 
 use MediaWiki\MediaWikiServices;
+use Html;
 
 class ctcSpecialUtils {
 
     public static function runSimple( $titleObj, $titleName, $link ) {
-        $html = \Html::rawElement(
+        $html = Html::rawElement(
             "div",
             [ "class" => "cetei-result" ],
             $link
