@@ -1,6 +1,6 @@
 {
 	"name": "CETEIcean",
-	"version": "0.7",
+	"version": "0.8",
 	"type": "parserhook",
 	"author": [
 		"[https://github.com/hcayless Hugh Cayless] and [https://github.com/raffazizzi Raffaele Viglianti] (library creators)",
@@ -39,7 +39,9 @@
 		"Ctc\\Content\\": "src/Content/",
 		"Ctc\\Process\\": "src/Process/",
 		"Ctc\\ParserFunctions\\": "src/ParserFunctions",
-		"Ctc\\Special\\": "src/Special/"
+		"Ctc\\Special\\": "src/Special/",
+		"Ctc\\SMW\\": "src/SMW/",
+		"Ctc\\API\\": "src/API/"
 	},
 	"AutoloadClasses": {
 		"ctcHooks": "src/ctcHooks.php",
@@ -52,13 +54,15 @@
 	},
 	"Hooks": {
 		"Register": [ "ctcHooks::onRegister" ],
-		"BeforePageDisplay": [ "ctcHooks::onBeforePageDisplay" ],
+		"BeforePageDisplay": [ "ctcHooks::onBeforePageDisplay" ],		
 		"ParserFirstCallInit": [ "ctcHooks::onParserFirstCallInit" ],
 		"HtmlPageLinkRendererBegin": "ctcHooks::onHtmlPageLinkRendererBegin",
 		"ContentHandlerDefaultModelFor": [ "ctcHooks::contentHandlerDefaultModelFor" ],
 		"ParserAfterTidy": [ "ctcHooks::disableParserCache" ],
 		"ResourceLoaderGetConfigVars": [ "ctcHooks::onResourceLoaderGetConfigVars" ],
 		"SpecialSearchProfiles": "ctcHooks::onSpecialSearchProfiles",
+		"SetupAfterCache": "ctcHooks::onSetupAfterCache",
+		"SMW::Store::BeforeDataUpdateComplete": "ctcHooks::onBeforeDataUpdateComplete",
 		"CodeEditorGetPageLanguage": "ctcHooks::onCodeEditorGetPageLanguage",
 		"AdminLinks": [ "ctcHooks::addToAdminLinks" ]
 	},
@@ -191,12 +195,12 @@
 			"localBasePath": "modules",
 			"remoteExtPath": "CETEIcean/modules",
 			"packageFiles": [
-				"ace/ace.js"
+				"lib-ace/ace.js"
 			]
 		},
 		"ext.ace.utils": {
-			"localBasePath": "modules/ace",
-   			"remoteExtPath": "CETEIcean/modules/ace",
+			"localBasePath": "modules/lib-ace",
+   			"remoteExtPath": "CETEIcean/modules/lib-ace",
 			"packageFiles": [
 				"mode-xml.js",
 				"worker-xml.js"
@@ -219,6 +223,27 @@
 			"packageFiles": [
 				"highlight.min.js"
 			]
+		},
+		"ext.ctc.search": {
+			"packageFiles": [ "ext.ctc.search.js" ],
+			"dependencies": [
+				"ext.ctc.search.components",
+				"vue",
+				"mediawiki.api",
+				"mediawiki.ForeignApi",
+				"mediawiki.user"
+			]
+		},
+		"ext.ctc.search.components": {
+			"packageFiles": [
+				"search-components/index.js",
+				"search-components/Search.vue",
+				"search-components/SMWSearch.vue"
+			],
+			"dependencies": [ "@wikimedia/codex" ],
+			"codexComponents": [
+				"CdxTextInput"
+			]
 		}
 	},
 	"SpecialPages": {
@@ -228,11 +253,11 @@
 	"config_prefix": "wg",
 	"config": {
 		"CeteiXsl": {
-			"value": "/extensions/CETEIcean/modules/ext.ctc.xsl",
+			"value": "/extensions/CETEIcean/xml/ext.ctc.xsl",
 			"description": "The path to the XSL file."
 		},
 		"CeteiDTD": {
-			"value": "/extensions/CETEIcean/modules/ext.ctc.entities.dtd",
+			"value": "/extensions/CETEIcean/xml/ext.ctc.entities.dtd",
 			"description": "The path to the DTD file containing character entities."
 		},
 		"CeteiBehaviorsJsFile": {
@@ -262,10 +287,17 @@
 		"CeteiPublicationCheck": {
 			"value": false,
 			"description": "Array with the keys 'smwProperty', 'valueIfPublic', 'valueIfPrivate' "
+		},
+		"CeteiSMWPropertyForSearchIndex": {
+			"value": false,
+			"description": "Semantic MediaWiki property to store search index content in chunks."
 		}
 	},
 	"ConfigRegistry": {
 		"CETEIcean": "GlobalVarConfig::newInstance"
+	},
+	"APIModules": {
+		"cetei-search": "Ctc\\API\\ctcAPISearch"
 	},
 	"manifest_version": 2,
 	"load_composer_autoloader": false

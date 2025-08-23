@@ -57,7 +57,7 @@ $(document).ready(function(){
 		});
 		origTextarea.value = aceEditor.getSession().getValue();
 
-		// Keyboard shortcut to add expan tags
+		// Keyboard shortcut to add ex tags
 		// A similar feature is in ext.ctc.editor.js
 		aceEditor.container.addEventListener('keydown', function(e) {
 			if (e.metaKey && e.key === 'i') {
@@ -65,7 +65,7 @@ $(document).ready(function(){
 				const selected = aceEditor.getSelectedText();
 				if ( selected !== "" ) {
 					console.log( selected );
-					var newVal = "<expan>" + selected + "</expan>";
+					var newVal = "<ex>" + selected + "</ex>";
 					aceEditor.session.replace( aceEditor.selection.getRange(), newVal );
 					//aceEditor.session.insert( aceEditor.getCursorPosition(), newVal );
 					var newVal = "";

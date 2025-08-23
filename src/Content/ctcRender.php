@@ -14,7 +14,7 @@ use OOUI\ButtonWidget;
 use Ctc\Core\ctcUtils;
 use Ctc\Process\ctcXmlProc;
 use Ctc\Content\ctcTabWidget;
-use Ctc\Content\ctcSMWPublisher;
+use Ctc\SMW\ctcSMWPublisher;
 
 class ctcRender {
 
@@ -58,21 +58,23 @@ class ctcRender {
 			/* Retrieve basic data from document through ctcXmlProc class  */
 			$hasTeiHeader = $ctcXmlProc->hasTEIHeader( $sourceContent );
 		} else {
+			// Allow for starting out with a blank sheet
 			$preSourceContent = $sourceContent = $ceteiInstanceDiv = "";
 			$hasTeiHeader = false;
 		}
-
-		// Optionally, use designated template for 'About' section
+		
 		$aboutSectionTemplate = RequestContext::getMain()->getConfig()->get( "CeteiAboutSectionTemplate" );
 		if ( $aboutSectionTemplate !== false ) {
+			// Optionally, use designated template for 'About' section
 			$aboutSectionFromTemplate = self::letTemplateRenderAboutSection( $aboutSectionTemplate, $pageTitle, $teiHeaderTitle );
+			$aboutSectionContent = $aboutSectionFromTemplate;
+			$docBtnStr = "";
 		} else {
+			// Else use /doc page, with button widget
 			$aboutSectionFromTemplate = "";
+			[ $docPageStr, $docBtnStr ] = self::getDocPage( $pageTitle, $context, $outputPage );
+			$aboutSectionContent = $docPageStr;
 		}
-
-		// About tab (2) - get /doc subpage and button widget
-		[ $docPageStr, $docBtnStr ] = self::getDocPage( $pageTitle, $context, $outputPage );
-		$aboutSectionContent = $aboutSectionFromTemplate . $docPageStr;
 
 		// Optionally, check if public viewing is allowed according to SMW property
 		$isPublic = true;
@@ -91,8 +93,6 @@ class ctcRender {
 				// @dev - we still need section to render, or we'll lose properties
 				$notPublicMsg . "<div style='display:none;'>" . $aboutSectionContent . "</div>",
 				true,
-				// $context->getTitle()
-				//$outputPage->getTitle()
 				$titleObj
 			);
 			return;
@@ -132,7 +132,7 @@ class ctcRender {
 		// Out with the old, in with the new doc type
 		$newXmlStr = $ctcXmlProc->removeAndAddDocType( $xmlStr );
 		$ctcHeaderTitle = $ctcXmlProc->getHeaderTitle( $newXmlStr );
-		$displayTitle = ( $ctcHeaderTitle !== null ) ? self::sanitiseDisplayTitle($ctcHeaderTitle) : $pageName;
+		$displayTitle = $ctcHeaderTitle !== null ? self::sanitiseDisplayTitle($ctcHeaderTitle) : $pageName;
 		return $displayTitle;
 	}
 

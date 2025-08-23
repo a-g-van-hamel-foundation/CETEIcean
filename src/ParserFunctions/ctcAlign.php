@@ -9,10 +9,54 @@
 
 namespace Ctc\ParserFunctions;
 
+use Parser;
+use PPFrame;
+use Html;
 use Ctc\Core\ctcUtils;
 use Ctc\Process\ctcXmlProc;
+use Ctc\ParserFunctions\ctcParserFunctionUtils;
+use Ctc\ParserFunctions\ctcParserFunctionsInfo;
 
 class ctcAlign {
+
+	/**
+	 * Run #cetei-align parser function
+	 */
+	public static function runCeteiAlignPF( Parser $parser, PPFrame $frame, $params ) {
+		$paramsAllowed = [
+			"resources" => "",
+			"resourcesep" => "^^",
+			"valsep" => ";",
+			"selectors" => "//ctc:xml:id[@n='***']",
+			"align" => null,
+			// alias for align:
+			"map" => null,
+			"rangesep" => null,
+			"action" => "normal"
+		];
+
+		// $xmlStr = self::getDocXmlStr( $parser, $frame, $args );
+		[ $resourceStr, $resourceSep, $valSep, $selectors, $alignCsvStr, $map, $rangeSep, $action ] = array_values( ctcParserFunctionUtils::extractParams( $frame, $params, $paramsAllowed ) );
+		$alignCsvStr = $alignCsvStr ?? $map ?? "";
+
+		if ( $action == "info" ) {
+			$info = ctcParserFunctionsInfo::getParserFunctionInfo( "cetei-align" );
+			return $parser->recursiveTagParse( $info );
+		}
+
+		$xmlStr = self::align( $resourceStr, $resourceSep, $selectors, $alignCsvStr, $valSep, $rangeSep );
+		$ctcXmlProc = new ctcXmlProc();
+		$xmlTransformed = $ctcXmlProc->transformXMLwithXSL( $xmlStr, null );
+
+		$output = Html::rawElement( 'div', [
+			//'id' => 'cetei-' . $randomNo1 . '-' . $randomNo2,
+			'class' => 'cetei-instance cetei-rendering',
+			'noparse' => true,
+			'isHTML' => true
+			], $xmlTransformed
+		);
+		return [ $output, 'noparse' => true, 'isHTML' => true ];
+	}
 
 	/**
 	 * Accepts multiple documents
@@ -87,7 +131,7 @@ class ctcAlign {
 		string $valSep,
 		int $lineNumber
 	) {
-		//$rowXml = ctcAlign::createRow( $xmlArr, $selectors, $vals, $lineNumber );
+		//$rowXml = self::createRow( $xmlArr, $selectors, $vals, $lineNumber );
 		$rowStr = "";
 		foreach ( $valArr as $k => $val ) {
 			if ( trim($val) == "" || $textArr[$k] == "" ) {

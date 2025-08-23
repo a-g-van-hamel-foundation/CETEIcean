@@ -17,6 +17,7 @@ use QueryPage;
 use RequestContext;
 use Html;
 use MWTimestamp;
+use Ctc\Core\ctcUtils;
 
 class ctcSpecialPage extends QueryPage {
 
@@ -121,9 +122,8 @@ class ctcSpecialPage extends QueryPage {
 		//$pagelatest = $result->pagelatest;
 
 		$title = Title::makeTitle( NS_CETEI, $pageName ); // object
-		$docTitle = Title::makeTitle( NS_CETEI, $pageName . "/doc" );
 		$visibleTitle = ( $result->displaytitle !== "" && $result->displaytitle !== null )
-			? $result->displaytitle
+			? html_entity_decode( $result->displaytitle )
 			: str_replace( "_", " ", $result->title );
 
 		$wikiPageFactory = MediaWikiServices::getInstance()->getWikiPageFactory();
@@ -151,9 +151,15 @@ class ctcSpecialPage extends QueryPage {
 		$titleLink = $this->getLinkRenderer()->makeKnownLink( $title, $visibleTitle );
 		// testing
 		//$titleLink = $visibleTitle;
-		$docTitleLink = $this->getLinkRenderer()->makeKnownLink( $docTitle, 'doc' );
 
-		$titleStr = "<div class='title-link'><span>{$titleLink}</span> ($editLink) / <span>$docTitleLink</span></div>";
+		$titleStr = "<span>{$titleLink}</span> ($editLink)";
+		$docTitle = Title::makeTitle( NS_CETEI, $pageName . "/doc" );
+		if ( $docTitle->exists( 0 ) ) {
+			$docTitleLink = $this->getLinkRenderer()->makeKnownLink( $docTitle, 'doc' );
+			$titleStr .= " / <span>$docTitleLink</span>";
+		}
+		$titleStr = "<div class='title-link'>$titleStr</div>";
+
 		$detailStr = "<div class='details'><span class='created'>Created by {$creator} on {$oldestTimestamp}</span><span class='lastedited'>Last edited by {$latestUserName} on {$timestamp}</span></div>";
 		$res = "<div class='cetei-specialpage-result'>{$titleStr}{$detailStr}</div>";
 
@@ -164,9 +170,11 @@ class ctcSpecialPage extends QueryPage {
 		return 'cetei_group';
 	}
 
+	/**
+	 * @todo there are dedicated methods to achieve this
+	 */
 	public static function fetchExtensionJson() {
-		global $IP;
-		$jsonSource = "$IP/extensions/CETEIcean/extension.json";
+		$jsonSource = ctcUtils::getExtensionPath() . "/extension.json";
 		if ( file_exists( $jsonSource ) ) {
 			$jsonContents = file_get_contents( $jsonSource );
 			$jsonStr = json_decode( $jsonContents, true );

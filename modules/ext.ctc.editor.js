@@ -54,6 +54,16 @@
 							label: 'Preliminaries',
 							characters: [
 								{
+									label: 'TEI (minimal)',
+									action: {
+										type: 'encapsulate',
+										options: {
+											pre: '<TEI xmlns="http://www.tei-c.org/ns/1.0">\n<teiHeader>\n</teiHeader>\n\n<text>\n<body>',
+											post: '\n</body>\n</text>\n</TEI>'
+										}
+									}
+								},
+								{
 									label: 'teiHeader (prefilled)',
 									action: {
 										type: 'encapsulate',
@@ -399,7 +409,7 @@
 			// const selected = aceEditor.getSelectedText();
 			if (e.metaKey && e.key === 'i') {
 				e.preventDefault();
-				var newVal = "<expan>" + selectedText + "</expan>";
+				var newVal = "<ex>" + selectedText + "</ex>";
 				session.replace( selection.getRange(), newVal );
 			}
 		});

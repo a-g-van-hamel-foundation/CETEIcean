@@ -25,6 +25,25 @@ use Ctc\Process\ctcXmlProc;
 class ctcUtils {
 
 	/**
+	 * Get path to the extension's directory
+	 * Required if extension is not found in the default extensions directory
+	 * @return array|string
+	 */
+	public static function getExtensionPath( $type = "absolute" ) {
+		$allThings = ExtensionRegistry::getInstance()->getAllThings();
+		$jsonPath = $allThings["CETEIcean"]["path"];
+		$absolutePath = str_replace( "/extension.json", "", $jsonPath );
+		if ( $type === "absolute") {
+			return $absolutePath;
+		} else {
+			// relative
+			global $IP;
+			// @note starts with forward slash
+			return str_replace( $IP, "", $absolutePath );
+		}
+	}
+
+	/**
 	 * Check if present user is in the 'user' group
 	 * Originally part of ctcRender class
 	 * @todo: change hardcoded 'user' to language-independent value?
@@ -91,6 +110,7 @@ class ctcUtils {
 	/** 
 	 * Utility - accept title (string) and return full-text content
 	 * Intended for XML content
+	 * @link https://www.mediawiki.org/wiki/Manual:WikiPage.php
 	 */
 	public static function getContentfromTitleStr(
 		string $titleStr,
@@ -98,12 +118,12 @@ class ctcUtils {
 	): string {
 		// maybe resolve redirects first?
 		$titleObj = Title::newFromText( $titleStr );
-		if ( $titleObj == null ) {
+		if ( $titleObj === null ) {
 			//self::printRawText( 'Could not find page...' );
 			return $default;
 		}
 		$wikiObj = WikiPage::factory( $titleObj );
-		// https://www.mediawiki.org/wiki/Manual:WikiPage.php
+
 		$wikiContent = $wikiObj->getContent( RevisionRecord::RAW );
 		$text = '';
 		$text = ContentHandler::getContentText( $wikiContent );
@@ -116,7 +136,9 @@ class ctcUtils {
 	}
 
 	/**
-	 * Summary of getRawContentFromTitleObj
+	 * Fetch the raw, unprocessed source content of a page.
+	 * Supports slots other than 'main'
+	 * 
 	 * @param Title $titleObj
 	 * @param string $slotName
 	 * @return string|bool

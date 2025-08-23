@@ -7,11 +7,12 @@
  * To be instantiated only after installation of SMW has been verified.
  */
 
-namespace Ctc\Content;
+namespace Ctc\SMW;
 
 use Title;
 use StoreFactory;
 use SMWQueryProcessor;
+use Ctc\SMW\ctcSMWQuery;
 
 class ctcSMWPublisher {
 
@@ -47,7 +48,7 @@ class ctcSMWPublisher {
 			"offset=0",
 			"searchlabel="
 		];
-		$smwQueryObj = self::createSMWQueryObjFromRawQuery( $rawQueryComponents, false );
+		$smwQueryObj = ctcSMWQuery::createSMWQueryObjFromRawQuery( $rawQueryComponents, false );
 
 		// Now run the query and get a QueryResult
 		$smwStore = self::getSMWStore();
@@ -82,28 +83,10 @@ class ctcSMWPublisher {
 	}
 
 	/**
-	 * Accepts a raw query in the array format and
-	 * creates from it an SMWQuery object.
-	 * @link https://github.com/SemanticMediaWiki/SemanticMediaWiki/blob/master/src/MediaWiki/Api/Query.php
-	 * 
-	 * @param array $rawQueryArr
-	 * @param mixed $useShowMode - whether to use #show instead of #ask
-	 * @return object SMWQuery
+	 * @deprecated
 	 */
 	public static function createSMWQueryObjFromRawQuery( array $rawQueryArr, $useShowMode = false ) {
-		[ $queryString, $processedParams, $printouts ] = SMWQueryProcessor::getComponentsFromFunctionParams( $rawQueryArr, $useShowMode );
-		SMWQueryProcessor::addThisPrintout( $printouts, $processedParams );
-		$processedParams = SMWQueryProcessor::getProcessedParams( $processedParams, $printouts );
-
-		// Run query (SMWQuery) and return SMWQuery obj
-		$queryObj = SMWQueryProcessor::createQuery(
-			$queryString,
-			$processedParams,
-			SMWQueryProcessor::SPECIAL_PAGE,
-			'',
-			$printouts
-		);
-		return $queryObj;
+		return ctcSMWQuery::createSMWQueryObjFromRawQuery( $rawQueryArr, $useShowMode );
 	}
 
 	/**

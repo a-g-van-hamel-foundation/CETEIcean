@@ -1,11 +1,15 @@
 <?php
 
+/**
+ * Class for the #cetei and #cetei-ace parser functions
+ */
+
 namespace Ctc\ParserFunctions;
 
 use Parser;
 use PPFrame;
 use RequestContext;
-//use MediaWiki\MediaWikiServices;
+use MediaWiki\MediaWikiServices;
 //use MediaWiki\MainConfigNames;
 //use OutputPage;
 //use ParserOutput;
@@ -13,17 +17,22 @@ use Html;
 /* Required? */
 //use MediaWiki\Revision\RevisionRecord;
 use Ctc\Core\ctcUtils;
+use Ctc\Content\ctcSearchableContentUtils;
 use Ctc\Process\ctcXmlProc;
 use Ctc\Process\ctcXmlExtract;
 use Ctc\ParserFunctions\ctcAlign;
+use Ctc\ParserFunctions\ctcParserFunctionUtils;
 use Ctc\ParserFunctions\ctcParserFunctionsInfo;
+use Ctc\SMW\ctcSMWStore;
 
 class ctcParserFunctions {
 
-	/* Run #cetei parser function */
+	/**
+	 * Run #cetei parser function
+	 */
 	public static function runCeteiPF( Parser $parser, PPFrame $frame, $args ) {
-
 		$xmlStr = self::getDocXmlStr( $parser, $frame, $args );
+
 		if ( $xmlStr == null ) {
 			// @todo 
 			$xmlStr = "";
@@ -32,80 +41,23 @@ class ctcParserFunctions {
 			//$xml->registerXPathNamespace("def", "http://www.tei-c.org/ns/1.0");
 		$randomNo1 = rand(1000, 9999);
 		$randomNo2 = rand(1000, 9999);
-		$html = Html::rawElement( 'div', [
-			'id' => 'cetei-' . $randomNo1 . '-' . $randomNo2,
-			'class' => 'cetei-instance cetei-rendering',
-			'noparse' => true,
-			'isHTML' => true
-			], $xmlStr
+		$html = Html::rawElement( "div",
+			[
+				'id' => 'cetei-' . $randomNo1 . '-' . $randomNo2,
+				'class' => 'cetei-instance cetei-rendering',
+				'noparse' => true,
+				'isHTML' => true
+			],
+			$xmlStr
 		);
 
 		return [ $html, 'noparse' => true, 'isHTML' => true ];
 	}
 
-	public static function runCeteiAlignPF( Parser $parser, PPFrame $frame, $params ) {
-		// $xmlStr = self::getDocXmlStr( $parser, $frame, $args );
-		$resourceStr = $alignCsvStr = "";
-		$resourceSep = "^^";
-		$valSep = ";";
-		$selectors = "//ctc:xml:id[@n='***']";
-		$rangeSep = null;
-		$action = "normal";
-
-		foreach ( $params as $i => $param ) {
-			$paramExpanded = $frame->expand($param);
-			$keyValPair = explode( '=', $paramExpanded, 2 );
-			if ( count( $keyValPair ) > 1 ) {
-				$paramName = trim( $keyValPair[0] );
-				$value = trim( $keyValPair[1] );
-			} else {
-				$paramName = null;
-				$value = trim( $paramExpanded );
-			}
-			/* */
-			switch ( $paramName ) {
-				case 'resources': $resourceStr = $value;
-				break;
-				case 'resourcesep': $resourceSep = $value;
-				break;
-				case 'selectors' : $selectors = $value;
-				break;
-				case 'align': $alignCsvStr = $value;
-				break;
-				case 'map': $alignCsvStr = $value;
-				break;
-				case 'valsep': $valSep = $value;
-				break;
-				case 'rangesep': $rangeSep = $value;
-				break;
-				case 'action': $action = $value;
-				break;
-			}
-		}
-
-		if ( $action == 'info' ) {
-			$info = ctcParserFunctionsInfo::getParserFunctionInfo( 'cetei-align' );
-			return $parser->recursiveTagParse( $info );
-		}
-
-		$xmlStr = ctcAlign::align( $resourceStr, $resourceSep, $selectors, $alignCsvStr, $valSep, $rangeSep );
-		$ctcXmlProc = new ctcXmlProc();
-		$xmlTransformed = $ctcXmlProc->transformXMLwithXSL( $xmlStr, null );
-
-		$output = Html::rawElement( 'div', [
-			//'id' => 'cetei-' . $randomNo1 . '-' . $randomNo2,
-			'class' => 'cetei-instance cetei-rendering',
-			'noparse' => true,
-			'isHTML' => true
-			], $xmlTransformed
-		);
-		return [ $output, 'noparse' => true, 'isHTML' => true ];
-
-	}
-
 	/**
-	 * Load js - {{#cetei-ace:}}
-	 * @todo maybe add check if CodeEditor is installed.
+	 * {{#cetei-ace:}}
+	 * Load Ace js - 
+	 * @todo maybe add check if CodeEditor is installed?
 	 */
 	public static function runCeteiAcePF( $parser, $frame, $params ) {
 		$out = $parser->getOutput();
@@ -119,77 +71,86 @@ class ctcParserFunctions {
 	 * @return string|null
 	 **/
 	protected static function getDocXmlStr( Parser $parser, PPFrame $frame, $params ): string|null {
-		// Defaults
-		$paramDoc = $paramUrl = $text = "";
-		$paramSel = $paramBreak1 = $paramBreak2 = null;
-		$action = "normal";
-		// $outputDefault = '<div class="cetei-no-document-found"><i>' . wfMessage( 'cetei-no-document-found' )->parse() . '</i></div>';
 		if ( $params == null || $params == 'undefined' ) {
 			return null;
 		}
 
-		foreach ( $params as $i => $param ) {
-			$paramExpanded = $frame->expand( $param );
-			$keyValPair = explode( '=', $paramExpanded, 2 );
-			if ( count( $keyValPair ) > 1 ) {
-				$paramName = trim( $keyValPair[0] );
-				$value = trim( $keyValPair[1] );
-			} elseif ( $i == 1
-					&& count( $keyValPair ) == 1
-					&& trim( $keyValPair[0] ) !== 'doc' ) {
-				$paramName = 'doc'; // for shorthand {{#cetei:<doc>}}
-				$value = trim( $keyValPair[0] );
-			} else {
-				$paramName = null;
-				$value = trim( $paramExpanded );
-			}
-			/* */
-			switch ( $paramName ) {
-				case 'doc': $paramDoc = $value;
-				break;
-				case 'url': $paramUrl = $value;
-				break;
-				case 'sel': $paramSel = $value;
-				break;
-				case 'break1': $paramBreak1 = $value;
-				break;
-				case 'break2': $paramBreak2 = $value;
-				break;
-				case 'action': $action = $value;
-				break;
-			}
-		}
+		// @todo
+		$paramsAllowed = [
+			"doc" => "",
+			"url" => "",
+			"sel" => null,
+			"break1" => null,
+			"break2" => null,
+			"action" => "normal",
+			"text" => "",
+			// @todo
+			"property" => "Searchstring",
+			"term" => null
+		];
+		[ $paramDoc, $paramUrl, $paramSel, $paramBreak1, $paramBreak2, $action, $text, $propertyName, $searchTerm ] = array_values( ctcParserFunctionUtils::extractParams( $frame, $params, $paramsAllowed ) );
 
-		if ( $action == 'info' ) {
-			$info = ctcParserFunctionsInfo::getParserFunctionInfo( 'cetei' );
+		// $outputDefault = '<div class="cetei-no-document-found"><i>' . wfMessage( 'cetei-no-document-found' )->parse() . '</i></div>';
+
+		if ( $action === "info" ) {
+			$info = ctcParserFunctionsInfo::getParserFunctionInfo( "cetei" );
 			return $parser->recursiveTagParse( $info );
 		}
 
 		// cf. ctcUtils::getContentFromPageTitleOrUrl()
-		if ( $paramDoc !== '' ) {
+		if ( $paramDoc !== "" ) {
 			$text = ctcUtils::getContentfromTitleStr( $paramDoc, "" );
-		} else if ( $paramUrl !== '' ) {
-			$allowUrl = RequestContext::getMain()->getConfig()->get( 'CeteiAllowUrl' );
+		} elseif ( $paramUrl !== "" ) {
+			$allowUrl = RequestContext::getMain()->getConfig()->get( "CeteiAllowUrl" );
 			$defaultNoUrl = '<TEI xmlns="http://www.tei-c.org/ns/1.0"><text><p>URLs not allowed.</p></text></TEI>';
 			$text = ( $allowUrl == true ) ? ctcUtils::getContentfromUrl( $paramUrl, "" ) : $defaultNoUrl ;
 		} else {
 			return null;
 		}
 
-		if ( $paramBreak1 !== null && $paramBreak2 !== null ) {
+		if( $action === "semantifychunks" ) {
+			// @todo Experimental, work in progress
+			self::handleSemantifyChunksAction( $text, $propertyName, $parser );
+			// No visible output required
+			$output = null;
+		} elseif( $action === "semantifyexcerpts" ) {
+			// @todo Work in progress - store XPath selections
+			$ctcSMWStore = new ctcSMWStore();
+			$title = $parser->getPage();
+			$ctcSMWStore->createExcerptsAndSemantify( $title, $text, $paramSel, $propertyName );
+			// No visible output
+			$output = null;
+		} elseif ( $paramBreak1 !== null && $paramBreak2 !== null ) {
 			// Experimentally extract and repair
+			// @todo Consider Tidy repair methods instead
 			$output = self::getFragmentXmlStr ( $text, $paramBreak1, $paramBreak2, $paramDoc );
-		} else if ( $paramSel == null ) {
-			// Full document
-			$output = self::getFullDocXmlStr( $paramDoc, $text );
-		} else {
+		} elseif( $paramSel !== null ) {
 			// XPath selection
-			$output = self::getExcerptDocXmlStr ( $paramDoc, $paramSel, $text );
+			$output = self::getExcerptDocXmlStr( $paramDoc, $paramSel, $text );
+		} else {
+			// Full document
+			if( $action === "flatten" || $action === "highlight" ) {
+				// If any of these actions will be run later,
+				// it is more efficient to take the original xml string
+				$output = $text;
+			} else {
+				$output = self::getFullDocXmlStr( $paramDoc, $text );
+			}
+		}
+
+		// Optional actions
+		if( $action === "highlight" ) {
+			return self::handleHighlightAction( $output, $searchTerm );
+		} elseif( $action === "flatten" ) {
+			// @todo Should this be an official feature? Currently useful for testing.
+			$ctcSearchableContentUtils = new ctcSearchableContentUtils();
+			$text = $ctcSearchableContentUtils->transformXMLForSearch( $output, true );
+			return $text;
 		}
 
 		$res = null;
 		if ( $output !== null && $output !== false ) {
-			$res = str_replace(array("\r\n", "\r", "\n", "  " ), " ", trim($output) );
+			$res = str_replace(array( "\r\n", "\r", "\n", "  " ), " ", trim($output) );
 		}
 		return $res;
 	}
@@ -210,12 +171,16 @@ class ctcParserFunctions {
 	 * Extract part of MS using XPath expression.
 	 * Return empty document if no excerpt was created.
 	 */
-	public static function getExcerptDocXmlStr( $paramDoc, $paramSel, $text ): mixed {
+	public static function getExcerptDocXmlStr(
+		$paramDoc,
+		string $paramSel,
+		string $text
+	): mixed {
 		$ctcXmlProc = new ctcXmlProc();
 		$text = ctcXmlProc::addDocType( $text );
 		$excerpts = [];
 		//$seltest = "//ctc:p[@xml:id='p1']";
-		$excerpts = ctcXmlProc::getExcerpts( $text, $paramSel );		
+		$excerpts = ctcXmlProc::getExcerpts( $text, $paramSel );
 		$excerptStr = '';
 		if ( $excerpts !== false ) {
 			foreach ( $excerpts as $excerpt ) {
@@ -257,6 +222,37 @@ class ctcParserFunctions {
 
 		$output = $ctcXmlProc->transformXMLwithXSL( $text, null );
 		return $output;
+	}
+
+	/**
+	 * See also ctcHighlight
+	 * @param string|null $text - xml string
+	 * @param mixed $searchTerm
+	 * @return string
+	 */
+	private static function handleHighlightAction( string $text, mixed $searchTerm ) {
+		if ( $searchTerm === null || $searchTerm === "" ) {
+			return "";
+		}
+		$ctcSearchableContentUtils = new ctcSearchableContentUtils();
+		$text = $ctcSearchableContentUtils->transformXMLForSearch( $text, true );
+		$extracts = $ctcSearchableContentUtils->highlightTerm( $text, $searchTerm, "extracts" );
+		$res = "";
+		foreach( $extracts as $extract ) {
+			$res .= "<div class='cetei-search-extract'>$extract</div>";
+		}
+		return $res;
+	}
+
+	private static function handleSemantifyChunksAction( $text, $propertyName, $parser ) {
+		// Transform full document using XSL designed for search
+		$ctcSearchableContentUtils = new ctcSearchableContentUtils();
+		$text = $ctcSearchableContentUtils->transformXMLForSearch( $text, true );
+
+		// Create chunks and add them as values to property
+		$ctcSMWStore = new ctcSMWStore();
+		$title = $parser->getPage();
+		$ctcSMWStore->createChunksAndSemantify( $parser, $text, $title, $propertyName );
 	}
 
 }

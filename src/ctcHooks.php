@@ -7,13 +7,16 @@
 //use Parser;
 //use Title;
 //use RequestContext;
+use MediaWiki\Revision\RevisionRecord;
+use MediaWiki\MediaWikiServices;
 //use Config;
 //use HtmlArmor;
 //use ExtensionRegistry;
 	// use ALTree, ALSection, ALRow;
 use Ctc\Content\ctcRender;
 use Ctc\Special\ctcSpecialUtils;
-use Ctc\Content\SMWUtils;
+use Ctc\Content\ctcSearchableContentUtils;
+use Ctc\SMW\ctcSMWStore;
 
 class ctcHooks {
 
@@ -32,8 +35,8 @@ class ctcHooks {
 			$out->addModuleStyles( [ 'ext.tabs.styles' ] ); // prevent FOUC
 			$out->addModules( [ 'ext.tabs.assets' ] );
 			if ( $action == 'edit' || $action == 'submit' ) {
-					$out->addModuleStyles( [ 'ext.ctc.editor.styles' ] );
-					$out->addModules( [ 'ext.ctc.wikieditor' ] );
+				$out->addModuleStyles( [ 'ext.ctc.editor.styles' ] );
+				$out->addModules( [ 'ext.ctc.wikieditor' ] );
 			}
 		}
 
@@ -54,14 +57,10 @@ class ctcHooks {
 	 * Content model XML default in NS_CETEI NS, except for /doc pages
 	 */
 	public static function contentHandlerDefaultModelFor( Title $title, &$model ) {
-		$isDoc = ctcRender::isDocPage( $title->getPrefixedText() );
-		$nameSpace = $title->getNamespace();
-		if ( $nameSpace === NS_CETEI && $isDoc !== true ) {
+		if ( self::isCETEITitle( $title ) ) {
 			$model = CONTENT_MODEL_XML;
-			return true;
-		} else {
-			return true;
 		}
+		return true;
 	}
 
 	/**
@@ -86,9 +85,13 @@ class ctcHooks {
 	public static function onParserFirstCallInit( Parser $parser ) {
 		// Register any render callbacks with the parser
 		$flags = Parser::SFH_OBJECT_ARGS;
-		$parser->setFunctionHook( 'cetei', [ 'Ctc\ParserFunctions\ctcParserFunctions', 'runCeteiPF' ], $flags );
-		$parser->setFunctionHook( 'cetei-align', [ 'Ctc\ParserFunctions\ctcParserFunctions', 'runCeteiAlignPF' ], $flags );
-		$parser->setFunctionHook( 'cetei-ace', [ 'Ctc\ParserFunctions\ctcParserFunctions', 'runCeteiAcePF' ], $flags );
+		$parser->setFunctionHook( "cetei", [ "Ctc\ParserFunctions\ctcParserFunctions", "runCeteiPF" ], $flags );
+		$parser->setFunctionHook( "cetei-align", [ "Ctc\ParserFunctions\ctcAlign", "runCeteiAlignPF" ], $flags );
+		$parser->setFunctionHook( "cetei-ace", [ "Ctc\ParserFunctions\ctcParserFunctions", "runCeteiAcePF" ], $flags );
+		$parser->setFunctionHook( "cetei-fetch", [ "Ctc\ParserFunctions\ctcFetch", "runCeteiFetchPF" ], $flags );
+		$parser->setFunctionHook( "cetei-search", [ "Ctc\ParserFunctions\ctcSearch", "runCeteiSearchPF" ], $flags );
+		$parser->setFunctionHook( "cetei-smw-search", [ "Ctc\ParserFunctions\ctcSearch", "runCeteiSMWSearchPF" ], $flags );
+		$parser->setFunctionHook( "cetei-highlight", [ "Ctc\ParserFunctions\ctcHighlight", "runCeteiHighlightPF" ], $flags );
 		return true;
 	}
 
@@ -100,6 +103,16 @@ class ctcHooks {
 		global $wgCeteiBehaviorsJsFile;
 		$vars['wgCeteiBehaviorsJsFile'] = $wgCeteiBehaviorsJsFile;
 		return true;
+	}
+
+	public static function onSetupAfterCache() {
+		/* not now
+		// check if SESP is installed
+		if ( ExtensionRegistry::getInstance()->isLoaded( "SemanticExtraSpecialProperties" ) ) {
+			$sesp = new Ctc\SMW\ctcSMWExtraSpecialProperties();
+			$sesp->extendSESP();
+		}
+		*/
 	}
 
 	/**
@@ -117,13 +130,54 @@ class ctcHooks {
 	}
 
 	/**
+	 * If preferred property is set (datatype Text), add chunks of 
+	 * search index content to subobjects
+	 * @since 0.8 (experimental)
+	 * @param mixed $store
+	 * @param mixed $semanticData
+	 * @return bool
+	 */
+	public static function onBeforeDataUpdateComplete( $store, $semanticData ): bool {
+		$title = $semanticData->getSubject()->getTitle();
+		if ( $title === null || !self::isCETEITitle( $title ) ) {
+			return true;
+		}
+		$propertyName = MediaWikiServices::getInstance()->getMainConfig()->get( "CeteiSMWPropertyForSearchIndex" );
+		if ( $propertyName === false || $propertyName === null ) {
+			return true;
+		}
+
+		$wikiPage = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $title );
+		$contentObj = $wikiPage->getContent( RevisionRecord::RAW );
+		$ctcSearchableContentUtils = new ctcSearchableContentUtils();
+		$propertyValues = $ctcSearchableContentUtils->splitContentIntoOverlappingChunks( $contentObj->getTextForSearchIndex(), 150, 8 );
+
+		$ctcSMWStore = new ctcSMWStore();
+		$subobjectData = [];
+		foreach( $propertyValues as $k => $val ) {
+			if( $val === "" ) {
+				continue;
+			}
+			$subobjectData[] = [
+				$propertyName => [ $val ]
+			];
+		}
+		$diWikiPage = $semanticData->getSubject();
+		$subobjectSemanticData = $ctcSMWStore->storeinSubobjects( $title, $subobjectData, $diWikiPage );
+
+		$ctcSMWStore->updateSemanticData( $semanticData, $subobjectSemanticData );
+
+		return true;
+	}
+
+	/**
 	 * Add links to special page of AdminLinks extension
 	 * 
 	 * @param ALTree &$adminLinksTree
 	 * @return bool
 	 */
 	public static function addToAdminLinks( ALTree &$adminLinksTree ) {
-		if ( ExtensionRegistry::getInstance()->isLoaded( 'Admin Links' ) == false ) {
+		if ( ! ExtensionRegistry::getInstance()->isLoaded( 'Admin Links' ) ) {
 			return true;
 		}
 		global $wgScript;
@@ -184,6 +238,25 @@ class ctcHooks {
 					// been customised
 				}
 			}
+		}
+	}
+
+	/**
+	 * Helper method to check if a Title is a TEI page
+	 * (not a /doc page) in the Cetei namespace
+	 * @since 0.8
+	 * @param mixed $title
+	 * @return bool
+	 */
+	public static function isCETEITitle( $title ) {
+		if ( $title === null ) {
+			return false;
+		}
+		$isDoc = ctcRender::isDocPage( $title->getPrefixedText() );
+		if ( $title->getNamespace() === NS_CETEI && $isDoc !== true ) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 

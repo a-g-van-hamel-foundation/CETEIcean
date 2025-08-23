@@ -18,14 +18,18 @@ use Title;
 use ParserOutput;
 use Ctc\Content\ctcContent;
 use Ctc\Content\ctcRender;
+use Ctc\Content\ctcSearchableContentUtils;
+use Ctc\SMW\ctcSMWStore;
 
 class ctcContentHandler extends CodeContentHandler {
 
 	private $requestContext;
+	private $services;
+	private $config;
 
 	/**
 	 * @param string $modelId
-	*/
+	 */
 	//public const MODEL = CONTENT_MODEL_XML;
 
 	public function __construct(
@@ -34,6 +38,8 @@ class ctcContentHandler extends CodeContentHandler {
 	) {
 		parent::__construct( $modelId, $formats );
 		$this->requestContext = RequestContext::getMain();
+		$this->services = MediaWikiServices::getInstance();
+		$this->config = $this->services->getMainConfig();
 	}
 
 	/**
@@ -77,10 +83,9 @@ class ctcContentHandler extends CodeContentHandler {
 	 */
 	protected function fillParserOutput(
 		Content $content,
-		ContentParseParams $cpoParams, 
+		ContentParseParams $cpoParams,
 		ParserOutput &$parserOutput
 	) {
-		$services = MediaWikiServices::getInstance();
 		$pageIdentity = $cpoParams->getPage();
 		$title = Title::castFromPageReference( $pageIdentity ); //same as $title = $services->getTitleFactory()->castFromPageReference( $pageIdentity ); // ?
 		$options = $cpoParams->getParserOptions();
@@ -93,12 +98,12 @@ class ctcContentHandler extends CodeContentHandler {
 			// @todo insert error messsage here
 			return;
 		}
-		$textModelsToParse = $services->getMainConfig()->get( MainConfigNames::TextModelsToParse );
+		$textModelsToParse = $this->config->get( MainConfigNames::TextModelsToParse );
 		// preferred to global $wgTextModelsToParse;
 		$contentModel = $content->getModel(); // expected: cetei
 		if ( in_array( $contentModel, $textModelsToParse ) ) {
 			// Not cetei. Parse just to get links, etc., into database; HTML is replaced below.
-			$parserOutput = $services->getParserFactory()->getInstance()->parse(
+			$parserOutput = $this->services->getParserFactory()->getInstance()->parse(
 				$content->getText(),
 				$pageIdentity,
 				$options,
@@ -119,11 +124,14 @@ class ctcContentHandler extends CodeContentHandler {
 			$displayTitle = ctcRender::cleanAndGetHeaderTitle(
 				$freshContent,
 				$title->getText()
-			);			
+			);
 		} else {
 			$displayTitle = "Untitled (" . $title->getText() . ")";
 		}
 		$parserOutput->setDisplayTitle( $displayTitle );
+
+		// Semantic data now added through ctcHooks
+		// $this->semantifySearchIndexText( $parserOutput, $title, $content );
 
 		ctcRender::buildPage(
 			$outputPage,
@@ -147,6 +155,54 @@ class ctcContentHandler extends CodeContentHandler {
 			$el = Html::rawElement( 'div', [ 'class' => 'error' ], "" );
 			$parserOutput->setText( $el );
 			return;
+		}
+	}
+
+	/**
+	 * @deprecated See ctcHooks
+	 * Adds chunks of searchindex content as values of property
+	 * $wgCeteiSMWPropertyForSearchIndex (if set)
+	 * 
+	 * @param mixed $parserOutput
+	 * @param mixed $title
+	 * @param mixed $content
+	 * @return void
+	 */
+	private function semantifySearchIndexText( $parserOutput, $title, $content ) {
+		if ( !class_exists( '\SMW\StoreFactory' ) ) {
+			return;
+		}
+		$propertyName = $this->config->get( "CeteiSMWPropertyForSearchIndex" );
+		// @todo check the property exists and has datatype Text
+		if ( $propertyName !== false && $propertyName !== null ) {
+			$searchIndexText = $content->getTextForSearchIndex();
+			$ctcSearchableContentUtils = new ctcSearchableContentUtils();
+			$propertyValues = $ctcSearchableContentUtils->splitContentIntoOverlappingChunks( $searchIndexText, 150, 8 );
+			// $propertyName = "Searchstring";
+			// @todo - if SMW ...
+
+			$ctcSMWStore = new ctcSMWStore();
+
+			/* #set
+			$ctcSMWStore->storePropertyValuePairsInParserOutput(
+				$parserOutput,
+				$title,
+				$propertyName,
+				$propertyValues
+			);
+			*/
+			
+			// #subobject
+			$subobjectData = [];
+			foreach( $propertyValues as $k => $val ) {
+				if( $val === "" ) {
+					continue;
+				}
+				$subobjectData[] = [
+					$propertyName => [ $val ]
+				];
+			}
+			$ctcSMWStore->storeinSubobjects( $title, $subobjectData );
 		}
 	}
 

@@ -30,6 +30,8 @@
 	"ceteiceansearch": "Search TEI XML content",
 	"searchprofile-cetei": "TEI XML",
 	"searchprofile-cetei-tooltip":  "TEI XML",
-	"cetei-editor-check-errors": "Errors were detected. Hit cancel to correct your syntax and try again. Attempting to save the document now may cause you to lose uncommitted changes. Are you sure you want to try regardless?"
+	"cetei-editor-check-errors": "Errors were detected. Hit cancel to correct your syntax and try again. Attempting to save the document now may cause you to lose uncommitted changes. Are you sure you want to try regardless?",
+	"cetei-property-searchable-content": "Has content for TEI search",
+	"cetei-property-searchable-content-desc": "A rendition of the document stripped down and optimised for search"
 
 }

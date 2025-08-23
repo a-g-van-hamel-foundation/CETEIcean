@@ -12,8 +12,7 @@ use TextContent;
 //use OOUI\TabPanelLayout;
 //use OOUI\TabSelectWidget;
 //use OOUI\TabOptionWidget;
-//use Ctc\Content\ctcRender;
-use Ctc\Process\ctcXmlProc;
+use Ctc\Content\ctcSearchableContentUtils;
 
 class ctcContent extends TextContent {
 
@@ -22,10 +21,11 @@ class ctcContent extends TextContent {
 	 * @param string $modelId
 	 * @param bool $thorough
 	 */
-	 public const MODEL = CONTENT_MODEL_XML;
-	 public function __construct( $text, $modelId = self::MODEL ) {
+	public const MODEL = CONTENT_MODEL_XML;
+
+	public function __construct( $text, $modelId = self::MODEL ) {
 		parent::__construct( $text, $modelId );
-	 }
+	}
 
 	/**
 	 * Gets content for wiki's search index
@@ -36,21 +36,9 @@ class ctcContent extends TextContent {
 		if( $this->getText() === "" ) {
 			return "";
 		}
-
-		$ctcXmlProc = new ctcXmlProc();
-		$rawStr = ctcXmlProc::removeDocType( $this->getText() );
-		$xmlStr = ctcXmlProc::addDocType( $rawStr );
-
-		// The text itself, with entities
-		$xmlStrTransformed = $ctcXmlProc->transformXMLwithXSL( $xmlStr, null );
-		$taglessStr = strip_tags( $xmlStrTransformed );
-
-		// Make attribute values searchable, too
-		$attrValsArr = ctcXmlProc::getAttributeValues( $xmlStr );
-		$attrVals = implode( " | ", $attrValsArr );
-
-		$res = html_entity_decode( $taglessStr . " " . $attrVals, ENT_QUOTES | ENT_XML1, 'UTF-8' );
-		return $res;
+		$ctcSearchableContentUtils = new ctcSearchableContentUtils();
+		$text = $ctcSearchableContentUtils->transformXMLForSearch( $this->getText(), true );
+		return $text;
 	}
 
 	/**
@@ -68,7 +56,7 @@ class ctcContent extends TextContent {
 		'@phan-var WikitextContent $wikitext';
 		if ( $textObject ) {
 			$text = $textObject->getText();
-			$text = htmlentities( $text, ENT_QUOTES, 'UTF-8' );
+			$text = htmlentities( $text, ENT_QUOTES, "UTF-8" );
 			return $text;
 		} else {
 			return false;

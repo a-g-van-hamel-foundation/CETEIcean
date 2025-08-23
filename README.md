@@ -17,17 +17,19 @@ The section headed "About" is intended for metadata, i.e. information about the 
 
 **Method 1: /doc subpage**
 
-To get any wikitext content transcluded in this section, create a `/doc` subpage of the document and write your content there. This approach is similar to how the Scribunto extension lets you associate documentation pages with Lua modules. For instance, if the full pagename of your document is `Cetei:Aeneid`, create the subpage `Cetei:Aeneid/doc`.
+To get any wikitext content transcluded in this section, create a `/doc` subpage of the document and write your content there. This approach is similar to how the Scribunto extension lets you associate documentation pages with Lua modules. For instance, if the full pagename of your document is `Cetei:Aeneid`, create the subpage `Cetei:Aeneid/doc`. See 'Customisation' below for some help.
 
-If you have installed Semantic MediaWiki and want to add semantic properties to the subpage, just be aware that it is up to you to prevent semantic information from becoming duplicated as a result of transclusion. See Customisation below for some help.
+If you have installed Semantic MediaWiki and want to add semantic properties to the subpage, just be aware that it is up to you to prevent semantic information from becoming duplicated as a result of transclusion. 
 
 **Method 2: template** (since v0.7)
 
 Another way to get things done is to let a dedicated wiki template manage whatever content it is that you need, which will be rendered in this specific spot. Although you can use it to show generic information, the intended scenario here is one which your data live elsewhere, in a [content slot](https://www.mediawiki.org/wiki/Multi-Content_Revisions) or even on a different wiki page, and would benefit from a template to handle their display and revision.
 
-CODECS, for instance, stores structured data about the TEI XML document in a JSON slot of the page and uses a template in a wikitext slot to store data in Semantic MediaWiki properties. This largely follows the approach of the [OpenCSP](https://www.open-csp.org)) project, using a setup that involves the use of the WSSlots and FlexForm extensions, but does not depend on the (Chameleon) skin and system messages to provide the interface. Instead it is through the template that this extension takes care of presenting metadata and making the JSON editable by loading a form.
+CODECS, for instance, stores structured data about the TEI XML document in a JSON slot of the page and uses a template in a wikitext slot to store data in Semantic MediaWiki properties. This largely follows the approach of the [OpenCSP](https://www.open-csp.org)) project, using a setup that involves the use of the WSSlots and FlexForm extensions, but does not depend on the (Chameleon) skin and system messages to provide the interface. Instead it is through the template that this extension takes care of presenting metadata and making the JSON editable by loading a form. 
 
-To tell the wiki which template must be used, set its name (without namespace prefix) in the `#wgCeteiAboutSectionTemplate` config setting. The template parameter `FULLPAGENAME` is automatically assigned the name of the page (though you can still use `{{FULLPAGENAME}}` to achieve the same result). Do not use it to store data in Semantic MediaWiki properties because update scripts like rebuildData may ignore it.
+To tell the wiki which template must be used, set its name (without namespace prefix) in the `#wgCeteiAboutSectionTemplate` config setting. Two parameters are automatically assigned to your template: `FULLPAGENAME` (though you can still use `{{FULLPAGENAME}}` to achieve the same result) and `Displaytitle`, which gives you a normalised version of the title extracted from TEIHeader. 
+
+Do not use this template to store data in Semantic MediaWiki properties because update scripts like rebuildData may well ignore it.
 
 #### 3. Source code
 To allow others to inspect the shape of the document and maybe learn from it, the raw source code is directly exposed in the final tab pane.
@@ -49,7 +51,7 @@ The CETEIcean extension extends the toolbar further by introducing
 - a new booklet section, "TEI XML", which lets you insert elements and code snippets into the document. Please be aware that the present arrangement is basic and only provisional. It is currently organised into a number of categories, such as "Preliminaries", "Verse" and "Dictionaries", and will be revised, re-arranged and expanded in the future.
 - a button to launch the editor in full-screen mode.
 
-## Usage: The `#cetei` parser function
+## Usage: the `#cetei` parser function
 Use the `#cetei` parser function to retrieve a document, or select excerpts from it, on a regular wiki page:
 
 ### Retrieve the document
@@ -114,6 +116,25 @@ In (TEI) XML, not all units are necessarily encoded through matching pairs of op
 }}
 ```
 
+## Usage: edit XML in a form with `#cetei-fetch` and `#cetei-ace`
+These parser functions are available for loading XML in a form outside of the standard text editor associated with a page. `#cetei-fetch` can be used to fill a textarea with the document's unprocessed XML content, while `#cetei-ace` enables the Ace editor on any textarea with the class `ace-editor`. For instance, to edit the page `Cetei:Aneid` using a form created with the FlexForm extension, you could write something like this in the following example:
+
+```
+{{#cetei-ace:}}
+<textarea name="TEIContent" html="all" class="ace-editor">{{#cetei-fetch:page=Cetei:Aeneid}}</textarea>
+```
+
+## Usage: search TEI XML
+One way in which the default MediaWiki search page (`Special:Search`) lets you find wiki pages is by letting you search their source content in their raw form. The frequent use of tag elements and character entities makes this approach less than ideal for XML-encoded texts. To make them more easily searchable in the wiki, this extension pre-processes all content in the `Cetei` namespace before it gets indexed, e.g. applying a purpose-built XSLT but removing all tags from the document after the fact. The approach is still rough and ready and while there is no one-size-fits-all solution, has room for improvement. 
+
+A search profile ('TEI XML') is automatically added to Special:Search.
+
+If you don't want to send users to `Special:Search`, you can also use the `#cetei-search` parser function, which enables a simple standalone widget (written in Vue) that you can add to any page. 
+
+### See also
+<!-- `$wgCeteiSMWPropertyForSearchIndex` below -->
+- `#cetei-highlight` parser function
+
 ## Special:CETEIcean
 The special page `Special:CETEIcean` contains basic information about the extension and lists pages in the `Cetei:` namespace.
 
@@ -123,22 +144,23 @@ The extension comes with [system messages](https://www.mediawiki.org/wiki/Help:S
 - You are free to alter `MediaWiki:Cetei-edit-documentation-url` to set a different URL for the button that lets you edit the `/doc` subpage. The parameter `$1` will give you the title of that page. This can be useful if for instance, you prefer to use Page Forms or FlexForm instead of the regular wiki editor.
 
 ## Installation
-- Download the files and add the folder (`Ceteicean`) to your `/extensions` directory.
+- Download the files and add the folder (`CETEIcean`) to your `/extensions` directory.
 - Enable the extension in your `LocalSettings.php` file:
 ```
-wfLoadExtension( 'Ceteicean' );
+wfLoadExtension( 'CETEIcean' );
 define("NS_CETEI", 350);
 define("NS_CETEI_TALK", 351);
 ```
 Because MediaWiki does not support retrieving globals from extensions, the latter two lines may be required, for instance when you want to add the namespace to Semantic MediaWiki’s `$smwgNamespacesWithSemanticLinks`).
 - Add configuration options if necessary (see below).
+    - If the extension is added to a custom location other than the /extensions directory, make sure to update `$wgCeteiXsl`, `$wgCeteiDTD` and `$wgCeteiBehaviorsJsFile` accordingly.
 - Navigate to `Special:Version` on your wiki to verify that the extension is successfully installed.
 - You should be good to go.
 
 ## Configuration
 
-- `$wgCeteiXsl` (default value: `/extensions/CETEIcean/modules/ext.ctc.xsl`): XSL transformations using Custom Elements.
-- `$wgCeteiDTD` (default value: `/extensions/CETEIcean/modules/ext.ctc.entities.dtd`): the DTD declaration containing character entity references
+- `$wgCeteiXsl` (default value: `/extensions/CETEIcean/xml/ext.ctc.xsl`): XSL transformations using Custom Elements.
+- `$wgCeteiDTD` (default value: `/extensions/CETEIcean/xml/ext.ctc.entities.dtd`): the DTD declaration containing character entity references
 - `$wgCeteiBehaviorsJsFile` (default value: `/extensions/CETEIcean/modules/ext.ctc.behaviors.js`): JavaScript behaviours.
 - `$wgCeteiAllowEntitySubstitution` (default value: `false`)
 - `$wgCeteiAllowUrl` (default value: `false`)
@@ -167,10 +189,12 @@ Default: false (boolean). Whether entity substitution is allowed. See note on se
 ### `#wgCeteiAllowUrl`
 Default: false (boolean). Whether the parser function when used with `url` should be allowed to retrieve the contents of a document from a public URL accessible to the server.
 
+
+
 ### `$wgCeteiPublicationCheck`
 Default: false (boolean). Unless page access was prevented through some other means, the default is that documents are visible to anonymous visitors. To tell the extension that a given document should or should not be public, you can register a Semantic MediaWiki property for recording the intended status. Depending on the value of this property, the extension will then hide or show the content of the page and a placeholder message (editable as a system message) will appear if visitors are not allowed to view the full page.
 
-Note that this is only a soft protection for the sake of convenience. No attempt has been made to shut down alternative routes of access. For specialised solutions concering wiki pages more generally, see [the general MediaWiki guide](https://www.mediawiki.org/wiki/Manual:Preventing_access) and [this list of page-specific user rights extensions](https://www.mediawiki.org/wiki/Category:Page_specific_user_rights_extensions).
+Note that this is only a soft protection for the sake of convenience. No attempt has been made to shut down alternative routes of access. For specialised solutions concerning wiki pages more generally, see [the general MediaWiki guide](https://www.mediawiki.org/wiki/Manual:Preventing_access) and [this list of page-specific user rights extensions](https://www.mediawiki.org/wiki/Category:Page_specific_user_rights_extensions).
 
 Fictitious example:
 ```
@@ -208,7 +232,8 @@ These issues are currently addressed in the following way:
 - Because this extension was first written and tested with MW 1.35, which does not offer support for ES6 with ResourceLoader, the code in CETEIcean’s JS files has been transpiled to ES5 using [Babel js](https://babeljs.io) and a polyfill for custom elements is added as a dependency.
 
 ## Version history
-- 0.7. Created alternative to /doc subpages: set a wiki template in `wgCeteiAboutSectionTemplate` for rendering content in the 'About' section (see above), especially with a view to managing data in JSON slots; added `wgCeteiPublicationCheck` (optional) to let a semantic property dictate whether a given document should be shown to anonymous visitors. Added keyboard shortcut, Windows key+i (Windows) or Cmd(⌘)+i (OS), that can be used to enclose a selection of text with `expan` tags, which are ubiquitous in manuscript-based editions. Added fix for incomplete query on Special:CETEIcean. Added aliases file for special page and reorganised classes. Minor fixes.
+- 0.8. Added `#cetei-fetch` parser function for use with forms. Changed shortcut to use `ex` tags. Added `#cetei-search` parser function. The main contribution to v0.8 is the introduction of a set of experimental features relating to full content search and Semantic MediaWiki (FTS only) - see the separate README file. Further code cleanup and reorganisation.
+- 0.7. Created alternative to /doc subpages: set a wiki template in `wgCeteiAboutSectionTemplate` for rendering content in the 'About' section (see above), especially with a view to managing data in JSON slots; added `wgCeteiPublicationCheck` (optional) to let a semantic (SMW) property dictate whether a given document should be visible to anonymous visitors. Added keyboard shortcut, Windows key+i (Windows) or Cmd(⌘)+i (OS), that can be used to enclose a selection of text with `expan` tags, which are ubiquitous in manuscript-based editions. Added fix for incomplete query on Special:CETEIcean. Added aliases file for special page and reorganised classes. Minor fixes.
 - 0.6. Added support for ranges in `#cetei-align`. Further default entities added (all from iso-grk1.ent, n/N with macron, etc.). Use 'displaytitle' to sort and show results in Special:CETEIcean. Reduced sensitivity to XML errors. Fixed preview in edit mode. Deactivated syntax highlighting for exceptionally lengthy documents to prevent it from freezing the browser. With `action=info`, both `#cetei` and `#cetei-align` can provide self-documentation about parameters used. Styling changes. Removed 'beta' status.
 - 0.5. Added syntax highlighting to "Source code" tab in Cetei namespace (highlight.js). Changed output used for wiki search to be more search-friendly (rendered all entities, added section with attribute values). Added display title to indexing through ParserOutput. Added TEI XML to search profiles. Made certain notes collapsible/expandable. Special:CETEIcean improved and linked from AdminLinks. Custom dialog in event of error or warnings. Styling changes and minor modifications.
 - 0.4. Added `#cetei-align` parser function. Added Ace editor for use in FlexForm and Page Forms (using `#cetei-ace` to load JS).
