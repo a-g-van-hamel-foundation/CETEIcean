@@ -14,6 +14,8 @@ namespace Ctc\Process;
 
 class ctcXmlExtract {
 
+	private static $time = 0;
+
 	public static function extractFragmentFromXml( $xmlStr, $boundary1, $boundary2 ) {
 		$boundary1Arr = explode( "---", $boundary1, 3 );
 		$boundary2Arr = explode( "---", $boundary2, 3 );
@@ -80,7 +82,7 @@ class ctcXmlExtract {
 
 		// Match the lonely tags with new friends (array)
 		$friendsArr = self::matchLonelyTags( $tagInstancesLonely );
-		return( $friendsArr );
+		return $friendsArr;
 	}
 
 	/**
@@ -133,19 +135,25 @@ class ctcXmlExtract {
 	}
 
 	/**
+	 * Includes a timer to prevent code from running forever
 	 * @param string $tagInstancesStr
 	 * @param array $removeAllTagPairs
 	 * @return string
 	 */
 	public static function removeAllTagPairs( $tagInstancesStr, $allTagNames ) {
-		// Set a hard time limit to prevent execution from hanging indefinitely.
-		set_time_limit( 60 );
+		$timeStart = microtime(true);
 
 		$str = $tagInstancesStr;
 		$newStr = $prev = "";
 		do {
 			$prev = $str;
-			$newStr = $str = self::removePairsForTags( $str, $allTagNames );
+			$timeNow = microtime(true);
+			$timeLapsed = ($timeNow - $timeStart) / 1000000;
+			if ( $timeLapsed > 10 ) {
+				// @todo error message
+				return "";
+			}
+			$newStr = $str = self::removePairsForTags( $str, $allTagNames );			
 		} while ( $newStr !== $prev );
 		return $str;
 	}

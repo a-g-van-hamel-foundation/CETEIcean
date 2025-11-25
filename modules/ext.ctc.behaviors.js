@@ -1,4 +1,4 @@
-function createCollapsibleNote( elt, position ) {
+function createCollapsibleNote( elt, position ) {	
 	var numberValue = elt.getAttribute("n");
 	if ( numberValue == null ) {
 		var btn = `<span type="button" class="tei-anchor-collapsible">[note]</span>`;
@@ -133,6 +133,19 @@ var configCustomBehaviors = {
 				numberSpan.setAttribute("class", "tei-number paragraph-number");
 				numberSpan.textContent = '[¶ ' + numberValue + ']';
 				p.innerHTML = numberSpan.outerHTML + elt.innerHTML;
+				return p.content;
+			}]
+		],
+		"rdg": [
+			["tei-rdg[wit]", function(elt) {
+				var wit = elt.getAttribute("wit");
+				var witLabel = "";
+				if ( wit !== null ) {
+					wit = wit.replaceAll( "#", "" );
+					witLabel = "<span class='tei-rdg-wit'>[" + wit + "] </span>";
+				}
+				var p = document.createElement("template");
+				p.innerHTML = `<span class="tei-rdg">` + witLabel + elt.innerHTML + `</span>`;
 				return p.content;
 			}]
 		]

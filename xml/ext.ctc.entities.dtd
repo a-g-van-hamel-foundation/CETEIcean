@@ -41,6 +41,7 @@
 <!ENTITY Gdot "Gh" ><!ENTITY gdot "gh" >
 <!ENTITY Mdot "Mh" ><!ENTITY mdot "mh" >
 <!ENTITY Ndot "Ṅ" ><!ENTITY ndot "ṅ" >
+<!ENTITY Pdot "P<span class='h-for-dot-above'>h</span>" ><!ENTITY pdot "p<span class='h-for-dot-above'>h</span>" >
 <!ENTITY Sdot "Ṡ" ><!ENTITY sdot "ṡ" >
 <!ENTITY Tdot "Th" ><!ENTITY tdot "th" >
 <!ENTITY eogon "ę" ><!ENTITY Eogon "Ę" >
@@ -61,6 +62,9 @@
 <!ENTITY Icirc "Î"><!ENTITY icirc "î">
 <!ENTITY Ocirc "Õ"><!ENTITY ocirc "ô">
 <!ENTITY Ucirc "Û"><!ENTITY ucirc "û">
+
+<!ENTITY oslash "ø"><!ENTITY Oslash "Ø">
+
 <!ENTITY hellip "…">
 <!ENTITY CzzzzzFil "[Filíocht]"><!ENTITY CzzzzzPrós "[Prós]">
 <!ENTITY frac12 "½"><!ENTITY frac13 "⅓"><!ENTITY frac14 "¼"><!ENTITY frac15 "<small>1/5</small>">

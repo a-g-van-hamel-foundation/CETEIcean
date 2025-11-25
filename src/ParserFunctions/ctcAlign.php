@@ -31,12 +31,13 @@ class ctcAlign {
 			"align" => null,
 			// alias for align:
 			"map" => null,
+			"headers" => null,
 			"rangesep" => null,
 			"action" => "normal"
 		];
 
 		// $xmlStr = self::getDocXmlStr( $parser, $frame, $args );
-		[ $resourceStr, $resourceSep, $valSep, $selectors, $alignCsvStr, $map, $rangeSep, $action ] = array_values( ctcParserFunctionUtils::extractParams( $frame, $params, $paramsAllowed ) );
+		[ $resourceStr, $resourceSep, $valSep, $selectors, $alignCsvStr, $map, $headers, $rangeSep, $action ] = array_values( ctcParserFunctionUtils::extractParams( $frame, $params, $paramsAllowed ) );
 		$alignCsvStr = $alignCsvStr ?? $map ?? "";
 
 		if ( $action == "info" ) {
@@ -44,7 +45,7 @@ class ctcAlign {
 			return $parser->recursiveTagParse( $info );
 		}
 
-		$xmlStr = self::align( $resourceStr, $resourceSep, $selectors, $alignCsvStr, $valSep, $rangeSep );
+		$xmlStr = self::align( $resourceStr, $resourceSep, $selectors, $alignCsvStr, $valSep, $rangeSep, $headers );
 		$ctcXmlProc = new ctcXmlProc();
 		$xmlTransformed = $ctcXmlProc->transformXMLwithXSL( $xmlStr, null );
 
@@ -70,7 +71,8 @@ class ctcAlign {
 		string $selectors,
 		string $alignCsvStr,
 		string $valSep,
-		string|null $rangeSep = null
+		string|null $rangeSep = null,
+		mixed $headers = null
 	): string {
 		$resourceArr = array_map( 'trim', explode( $resourceSep, $resourceStr ) );
 		$selectorArr = array_map( 'trim', explode( $resourceSep, $selectors ) );
@@ -99,6 +101,15 @@ class ctcAlign {
 		foreach( $csvObj as $lineNumber => $vals ) {
 			$rowXmlStr = self::createExcerptRowStr( $textArr, $selectorArr, $vals, $valSep, $lineNumber );
 			$xmlStr .= $rowXmlStr;
+		}
+
+		if ( $headers !== null && $headers !== "" ) {
+			$headerArr = array_map( 'trim', explode( $valSep, $headers ) );
+			$headerStr = "";
+			foreach ( $headerArr as $k => $header ) {
+				$headerStr .= "<cit type='tei-excerpt-col'><head>{$header}</head></cit>";
+			}
+			$xmlStr = "<text type='tei-excerpt-row'>$headerStr</text>" . $xmlStr;
 		}
 
 		$xmlStr = "<TEI xmlns='http://www.tei-c.org/ns/1.0'><group type='parallel-excerpts'>{$xmlStr}</group></TEI>";

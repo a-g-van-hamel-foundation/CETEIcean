@@ -1,6 +1,6 @@
 {
 	"name": "CETEIcean",
-	"version": "0.8",
+	"version": "0.9",
 	"type": "parserhook",
 	"author": [
 		"[https://github.com/hcayless Hugh Cayless] and [https://github.com/raffazizzi Raffaele Viglianti] (library creators)",
@@ -163,7 +163,7 @@
 		"ext.ctc.icons": {
 				"localBasePath": "modules/images",
 				"remoteExtPath": "CETEIcean/modules/images",
-				"class": "ResourceLoaderImageModule",
+				"class": "MediaWiki\\ResourceLoader\\ImageModule",
 				"selector": ".ctc-icon-{name}:before",
 				"prefix": "ctc-icon",
 				"defaultColor": "#000",

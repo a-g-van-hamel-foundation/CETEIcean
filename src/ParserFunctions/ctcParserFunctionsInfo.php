@@ -72,6 +72,9 @@ class ctcParserFunctionsInfo {
 			"selectors" => [
 				"description" => "List of XPath selectors used for each resource, but with a placeholder (`***`) for the variable which comes from the `map` table below."
 			],
+			"headers" => [
+				"description" => "Optionally, headers for the columns in the alignment table. Use 'valsep' to separate the headers."
+			],
 			"valsep" => [
 				"description" => "Separator to use for values in `map`.",
 				"default" => ";"

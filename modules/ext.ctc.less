@@ -142,7 +142,14 @@ tei-gloss {
 	position: relative;
 	top: -0.4em;
 }
-tei-app {
+tei-app tei-lem {
+	text-decoration: underline dashed darkgreen;
+}
+tei-app tei-note {
+	// Override
+	display: inherit;
+}
+tei-app tei-rdg {
 	color:darkgreen;
 	font-size:0.8em;
 	vertical-align: baseline;
@@ -397,6 +404,9 @@ tei-cit[type="tei-excerpt-col"] {
 
 tei-choice tei-sic {
 	 text-decoration: line-through;
+}
+tei-sic {
+	text-decoration: underline wavy red;
 }
 
 tei-gap:before {

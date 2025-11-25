@@ -96,13 +96,13 @@ class ctcSMWPublisher {
 	 */
 	private function getValueFromQueryResult( $smwQueryRes, $fullPagename, $smwProperty ) {
 		if ( $smwQueryRes->getErrors() !== [] ) {
-			//print_r( "error..." );
 			return null;
 		}
 		$queryResultArr = $smwQueryRes->toArray();
-		// print_r( "<pre>" );
-		// print_r( $queryResultArr );
-		// print_r( "</pre>" );
+		if ( !array_key_exists( $fullPagename, $queryResultArr["results"] ) ) {
+			// Silently abort if no relevant page was found
+			return null;
+		}
 
 		$printouts = $queryResultArr["results"][$fullPagename]["printouts"];
 		foreach( $printouts as $prop => $vals ) {

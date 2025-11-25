@@ -113,6 +113,7 @@ In (TEI) XML, not all units are necessarily encoded through matching pairs of op
 3;3
 4;4
 |valsep=;
+|headers=Text 1;Text 2 // optional headers
 }}
 ```
 
@@ -232,6 +233,7 @@ These issues are currently addressed in the following way:
 - Because this extension was first written and tested with MW 1.35, which does not offer support for ES6 with ResourceLoader, the code in CETEIcean’s JS files has been transpiled to ES5 using [Babel js](https://babeljs.io) and a polyfill for custom elements is added as a dependency.
 
 ## Version history
+- 0.9. Fixed timer in XML fragment repair [use Tidy instead?]. Added entities for ø/Ø and 'P/p with dot above'. Added prefixes for readings (`rdg`) if the `wit` attribute is used. Added 'headers' option to `#cetei-align`. Additional styling (e.g. for `sic` without `choice`). Updated class of ResourceLoader's ImageModule. Changed behaviour for `$wgCeteiPublicationCheck` so that the check is aborted in the absence of a relevant query result, e.g. because the designated SMW property is not used.
 - 0.8. Added `#cetei-fetch` parser function for use with forms. Changed shortcut to use `ex` tags. Added `#cetei-search` parser function. The main contribution to v0.8 is the introduction of a set of experimental features relating to full content search and Semantic MediaWiki (FTS only) - see the separate README file. Further code cleanup and reorganisation.
 - 0.7. Created alternative to /doc subpages: set a wiki template in `wgCeteiAboutSectionTemplate` for rendering content in the 'About' section (see above), especially with a view to managing data in JSON slots; added `wgCeteiPublicationCheck` (optional) to let a semantic (SMW) property dictate whether a given document should be visible to anonymous visitors. Added keyboard shortcut, Windows key+i (Windows) or Cmd(⌘)+i (OS), that can be used to enclose a selection of text with `expan` tags, which are ubiquitous in manuscript-based editions. Added fix for incomplete query on Special:CETEIcean. Added aliases file for special page and reorganised classes. Minor fixes.
 - 0.6. Added support for ranges in `#cetei-align`. Further default entities added (all from iso-grk1.ent, n/N with macron, etc.). Use 'displaytitle' to sort and show results in Special:CETEIcean. Reduced sensitivity to XML errors. Fixed preview in edit mode. Deactivated syntax highlighting for exceptionally lengthy documents to prevent it from freezing the browser. With `action=info`, both `#cetei` and `#cetei-align` can provide self-documentation about parameters used. Styling changes. Removed 'beta' status.
