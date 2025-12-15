@@ -27,7 +27,7 @@ class ctcFetch {
 		if ( $titleObj === null ) {
 			return "";
 		}
-		$wikiObj = WikiPage::factory( $titleObj );
+		$wikiObj = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $titleObj );
 		$str = $wikiObj->getContent( RevisionRecord::RAW )->getText();
 
 		// Important. This is done to prevent character entities from being decoded
