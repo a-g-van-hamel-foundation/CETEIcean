@@ -122,7 +122,7 @@ class ctcUtils {
 			//self::printRawText( 'Could not find page...' );
 			return $default;
 		}
-		$wikiObj = WikiPage::factory( $titleObj );
+		$wikiObj = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $titleObj );
 
 		$wikiContent = $wikiObj->getContent( RevisionRecord::RAW );
 		$text = '';
