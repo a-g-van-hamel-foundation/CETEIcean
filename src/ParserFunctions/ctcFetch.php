@@ -6,10 +6,12 @@ use Parser;
 use PPFrame;
 use Title;
 use WikiPage;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
 use Html;
 use Ctc\ParserFunctions\ctcParserFunctionUtils;
 use Ctc\Core\ctcUtils;
+
 
 class ctcFetch {
 
@@ -17,7 +19,7 @@ class ctcFetch {
 	 * Parser function for fetching a document and getting it to be used inside a form.
 	 * {{#cetei-fetch: page= }}
 	 */
-	public static function runCeteiFetchPF(  Parser &$parser, PPFrame $frame, $params ) {
+	public static function runCeteiFetchPF( Parser &$parser, PPFrame $frame, $params ) {
 		$paramsAllowed = [
 			"page" => null
 		];
