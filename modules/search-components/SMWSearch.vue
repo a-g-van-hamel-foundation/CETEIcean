@@ -61,7 +61,7 @@ module.exports = defineComponent( {
 			if (searchterm === "") {
 				return;
 			}
-			const actionApiBaseUrl = "//" + mw.config.get( "wgServerName" ) + (mw.config.get( 'wgScriptPath' ) || "") + "/api.php";
+			const actionApiBaseUrl = mw.config.get( "wgServer" ) + (mw.config.get( "wgScriptPath" ) || "") + "/api.php";
 			const actionApi = new mw.Api( actionApiBaseUrl, { anonymous: true } );
 			const apiUrlParams = {
 				action: "cetei-search",
@@ -87,7 +87,7 @@ module.exports = defineComponent( {
 			// console.log( results );
 			// reset
 			queryResults.value = [];
-			const baseUrl = "//" + mw.config.get( "wgServerName" ) + (mw.config.get( "wgScriptPath" ) || "");
+			const baseUrl = mw.config.get( "wgServer" ) + (mw.config.get( "wgScriptPath" ) || "");
 			results.forEach( function( res, index, results ) {
 				//const href = baseUrl + `/${ encodeURIComponent( res.id ) }`;
 				const href = mw.util.getUrl(res.id);
