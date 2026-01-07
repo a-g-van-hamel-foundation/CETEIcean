@@ -3,9 +3,6 @@
 ( function() {
 
 	const Vue = require("vue");
-	Vue.configureCompat( {
-		MODE: 3
-	} );
 
 	function mountApp( Vue, App, item, configProps ) {
 		const createdApp = Vue.createMwApp( App, { configProps } );
