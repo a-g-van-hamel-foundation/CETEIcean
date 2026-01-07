@@ -1383,7 +1383,7 @@ function parse(source,defaultNSMapCopy,entityMap,domBuilder,errorHandler){
 		}else if(k.charAt(0) === '#'){
 			return fixedFromCharCode(parseInt(k.substr(1).replace('x','0x')))
 		}else{
-			errorHandler.error('entity not found:'+a);
+			//errorHandler.error('entity not found:'+a);
 			return a;
 		}
 	}
