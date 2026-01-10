@@ -17,7 +17,6 @@ use Title;
 use MediaWiki\Revision\SlotRecord;
 use WikiPage;
 use TitleValue;
-use ContentHandler;
 use Html;
 use ExtensionRegistry;
 use Ctc\Process\ctcXmlProc;
@@ -122,11 +121,8 @@ class ctcUtils {
 			//self::printRawText( 'Could not find page...' );
 			return $default;
 		}
-		$wikiObj = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $titleObj );
-
-		$wikiContent = $wikiObj->getContent( RevisionRecord::RAW );
-		$text = '';
-		$text = ContentHandler::getContentText( $wikiContent );
+		$wikiPage = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $titleObj );
+		$text = $wikiPage->getContent( RevisionRecord::RAW )->getText() ?? "";
 
 		/* Important */
 		//$ctcXmlProc = new ctcXmlProc();
