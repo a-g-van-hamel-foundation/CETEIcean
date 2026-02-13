@@ -22,7 +22,7 @@ class ctcAlign {
 	/**
 	 * Run #cetei-align parser function
 	 */
-	public static function runCeteiAlignPF( Parser $parser, PPFrame $frame, $params ) {
+	public function runCeteiAlignPF( Parser $parser, PPFrame $frame, $params ) {
 		$paramsAllowed = [
 			"resources" => "",
 			"resourcesep" => "^^",

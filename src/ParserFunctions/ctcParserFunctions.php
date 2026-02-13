@@ -30,7 +30,7 @@ class ctcParserFunctions {
 	/**
 	 * Run #cetei parser function
 	 */
-	public static function runCeteiPF( Parser $parser, PPFrame $frame, $args ) {
+	public function runCeteiPF( Parser $parser, PPFrame $frame, $args ) {
 		$xmlStr = self::getDocXmlStr( $parser, $frame, $args );
 
 		if ( $xmlStr == null ) {
@@ -59,7 +59,7 @@ class ctcParserFunctions {
 	 * Load Ace js - 
 	 * @todo maybe add check if CodeEditor is installed?
 	 */
-	public static function runCeteiAcePF( $parser, $frame, $params ) {
+	public function runCeteiAcePF( $parser, $frame, $params ) {
 		$out = $parser->getOutput();
 		$out->addModuleStyles( [ "ext.ctc.ace.styles" ] );
 		$out->addModules( [ "ext.ctc.ace" ] );

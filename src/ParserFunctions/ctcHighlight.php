@@ -13,7 +13,7 @@ use Ctc\Content\ctcSearchableContentUtils;
 
 class ctcHighlight {
 
-	public static function runCeteiHighlightPF( Parser $parser, PPFrame $frame, $args ) {
+	public function runCeteiHighlightPF( Parser $parser, PPFrame $frame, $args ) {
 		if ( $args == null || $args == 'undefined' ) {
 			return null;
 		}

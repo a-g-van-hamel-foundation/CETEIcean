@@ -19,7 +19,7 @@ class ctcFetch {
 	 * Parser function for fetching a document and getting it to be used inside a form.
 	 * {{#cetei-fetch: page= }}
 	 */
-	public static function runCeteiFetchPF( Parser &$parser, PPFrame $frame, $params ) {
+	public function runCeteiFetchPF( Parser &$parser, PPFrame $frame, $params ) {
 		$paramsAllowed = [
 			"page" => null
 		];

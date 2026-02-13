@@ -10,7 +10,7 @@
 	"description": "Implements the JavaScript library [https://github.com/TEIC/CETEIcean CETEIcean] to let users work with and display [https://tei-c.org/ TEI XML documents] on the wiki.",
 	"license-name": "GPL-2.0-or-later",
 	"requires": {
-		"MediaWiki": ">= 1.38.0",
+		"MediaWiki": ">= 1.43",
 		"extensions": {
 		}
 	},
@@ -38,33 +38,34 @@
 		"Ctc\\Core\\": "src/",
 		"Ctc\\Content\\": "src/Content/",
 		"Ctc\\Process\\": "src/Process/",
-		"Ctc\\ParserFunctions\\": "src/ParserFunctions",
+		"Ctc\\ParserFunctions\\": "src/ParserFunctions/",
 		"Ctc\\Special\\": "src/Special/",
 		"Ctc\\SMW\\": "src/SMW/",
 		"Ctc\\API\\": "src/API/"
-	},
-	"AutoloadClasses": {
-		"ctcHooks": "src/ctcHooks.php",
-		"ctcUtils": "src/ctcUtils.php"
 	},
 	"ExtensionMessagesFiles": {
 		"ctcMagic": "ctc.i18n.php",
 		"ctcNamespaces": "ctc.i18n.namespaces.php",
 		"ctcAliases": "ctc.i18n.aliases.php"
 	},
+	"callback": "Ctc\\Core\\ctcHooks::registrationCallback",
+	"HookHandlers": {
+		"main": {
+			"class": "Ctc\\Core\\ctcHooks"
+		}
+	},
 	"Hooks": {
-		"Register": [ "ctcHooks::onRegister" ],
-		"BeforePageDisplay": [ "ctcHooks::onBeforePageDisplay" ],		
-		"ParserFirstCallInit": [ "ctcHooks::onParserFirstCallInit" ],
-		"HtmlPageLinkRendererBegin": "ctcHooks::onHtmlPageLinkRendererBegin",
-		"ContentHandlerDefaultModelFor": [ "ctcHooks::contentHandlerDefaultModelFor" ],
-		"ParserAfterTidy": [ "ctcHooks::disableParserCache" ],
-		"ResourceLoaderGetConfigVars": [ "ctcHooks::onResourceLoaderGetConfigVars" ],
-		"SpecialSearchProfiles": "ctcHooks::onSpecialSearchProfiles",
-		"SetupAfterCache": "ctcHooks::onSetupAfterCache",
-		"SMW::Store::BeforeDataUpdateComplete": "ctcHooks::onBeforeDataUpdateComplete",
-		"CodeEditorGetPageLanguage": "ctcHooks::onCodeEditorGetPageLanguage",
-		"AdminLinks": [ "ctcHooks::addToAdminLinks" ]
+		"ParserFirstCallInit": "main",
+		"BeforePageDisplay": "main",
+		"HtmlPageLinkRendererBegin": "main",
+		"ContentHandlerDefaultModelFor": "main",
+		"ResourceLoaderGetConfigVars": "main",
+		"ParserAfterTidy": "main",
+		"SpecialSearchProfiles": "main",
+		"SetupAfterCache": "main",
+		"SMW::Store::BeforeDataUpdateComplete": "main",
+		"CodeEditorGetPageLanguage": "main",
+		"AdminLinks": "main"
 	},
 	"ContentHandlers": {
 		"cetei": "Ctc\\Content\\ctcContentHandler"
@@ -249,7 +250,6 @@
 	"SpecialPages": {
 		"CETEIcean": "Ctc\\Special\\ctcSpecialPage"
 	},
-	"callback": "ctcHooks::onRegister",
 	"config_prefix": "wg",
 	"config": {
 		"CeteiXsl": {

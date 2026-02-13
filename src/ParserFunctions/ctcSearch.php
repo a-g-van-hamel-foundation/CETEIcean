@@ -13,7 +13,7 @@ use Ctc\ParserFunctions\ctcParserFunctionUtils;
 
 class ctcSearch {
 
-	public static function runCeteiSearchPF( Parser &$parser, PPFrame $frame, $params ) {
+	public function runCeteiSearchPF( Parser &$parser, PPFrame $frame, $params ) {
 		/*
 		$paramsAllowed = [
 			"page" => null
@@ -27,7 +27,7 @@ class ctcSearch {
 		return  [ $res, 'noparse' => true, 'isHTML' => true ];
 	}
 
-	public static function runCeteiSMWSearchPF( Parser &$parser, PPFrame $frame, $params ) {
+	public function runCeteiSMWSearchPF( Parser &$parser, PPFrame $frame, $params ) {
 		/*
 		$paramsAllowed = [
 			"restrict" => true
