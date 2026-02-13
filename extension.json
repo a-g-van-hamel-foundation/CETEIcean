@@ -63,7 +63,7 @@
 		"ParserAfterTidy": "main",
 		"SpecialSearchProfiles": "main",
 		"SetupAfterCache": "main",
-		"SMW::Store::BeforeDataUpdateComplete": "main",
+		"SMW::Store::BeforeDataUpdateComplete": "Ctc\\Core\\ctcHooks::onBeforeDataUpdateComplete",
 		"CodeEditorGetPageLanguage": "main",
 		"AdminLinks": "main"
 	},
