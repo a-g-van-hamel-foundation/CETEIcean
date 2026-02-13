@@ -12,6 +12,7 @@ use MediaWiki\Config\Config;
 use HtmlArmor;
 use MediaWiki\Hook\ParserFirstCallInitHook;
 use MediaWiki\Output\Hook\BeforePageDisplayHook;
+use MediaWiki\Hook\InternalParseBeforeLinksHook;
 use MediaWiki\Linker\Hook\HtmlPageLinkRendererBeginHook;
 use MediaWiki\Revision\Hook\ContentHandlerDefaultModelForHook;
 use MediaWiki\ResourceLoader\Hook\ResourceLoaderGetConfigVarsHook;
@@ -35,6 +36,7 @@ use Ctc\ParserFunctions\ctcHighlight;
 class ctcHooks implements
 	ParserFirstCallInitHook,
 	BeforePageDisplayHook,
+	InternalParseBeforeLinksHook,
 	HtmlPageLinkRendererBeginHook,
 	ContentHandlerDefaultModelForHook,
 	ResourceLoaderGetConfigVarsHook,
@@ -42,6 +44,8 @@ class ctcHooks implements
 	SpecialSearchProfilesHook,
 	SetupAfterCacheHook
 {
+
+	private $requiresRLModule = false;
 
 	public function __construct() {
 		//
@@ -133,16 +137,19 @@ class ctcHooks implements
 		$namespaceConstant = $out->getTitle()->getNamespace();
 		$action = $out->getRequest()->getVal( 'action' );
 
-		$out->addModuleStyles( [ 'ext.ctc.styles' ] );
-		$out->addModules( [ 'ext.ctc' ] );
-
 		if ( $namespaceConstant === NS_CETEI ) {
+			$out->addModuleStyles( [ 'ext.ctc.styles' ] );
+			$out->addModules( [ 'ext.ctc' ] );
 			$out->addModuleStyles( [ 'ext.tabs.styles' ] ); // prevent FOUC
 			$out->addModules( [ 'ext.tabs.assets' ] );
 			if ( $action == 'edit' || $action == 'submit' ) {
 				$out->addModuleStyles( [ 'ext.ctc.editor.styles' ] );
 				$out->addModules( [ 'ext.ctc.wikieditor' ] );
 			}
+		} elseif( $this->requiresRLModule ) {
+			// Loads modules for parser functions if any is used
+			$out->addModuleStyles( [ 'ext.ctc.styles' ] );
+			$out->addModules( [ 'ext.ctc' ] );
 		}
 
 	}
@@ -176,6 +183,33 @@ class ctcHooks implements
 				}
 			}
 		}
+	}
+
+	/**
+	 * Do not try to re-parse because a lock is in place.
+	 */
+	public function onInternalParseBeforeLinks( $parser, &$text, $stripState ) {
+		if ( self::isParserFunctionFirstUsed( $parser ) ) {
+			$this->requiresRLModule = true;
+		}
+	}
+
+	/**
+	 * Helper function.
+	 * Returns true only when the parser function is first invoked.
+	 */
+	private static function isParserFunctionFirstUsed( $parser ): bool {
+		$parserOutput = $parser->getOutput();
+		if ( $parserOutput === null ) {
+			return false;
+		}
+		$extData = $parserOutput->getExtensionData( "ceteicean-module" );
+		if ( $extData !== null && ( array_key_exists( "ext.ctc", $extData ) )
+		) {
+			$counter = $extData["ext.ctc"];
+			return ( $counter == 1 ) ? true : false;
+		}
+		return false;
 	}
 
 	/**

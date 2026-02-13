@@ -57,6 +57,7 @@
 	"Hooks": {
 		"ParserFirstCallInit": "main",
 		"BeforePageDisplay": "main",
+		"InternalParseBeforeLinks": "main",
 		"HtmlPageLinkRendererBegin": "main",
 		"ContentHandlerDefaultModelFor": "main",
 		"ResourceLoaderGetConfigVars": "main",

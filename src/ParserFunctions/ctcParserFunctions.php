@@ -51,6 +51,10 @@ class ctcParserFunctions {
 			$xmlStr
 		);
 
+		// Add usage hint to 'extension data' so the RL module
+		// can be loaded once through BeforePageDisplay
+		$parser->getOutput()->appendExtensionData( "ceteicean-module", "ext.ctc" );
+
 		return [ $html, 'noparse' => true, 'isHTML' => true ];
 	}
 
