@@ -11,12 +11,10 @@
 namespace Ctc\Special;
 
 use MediaWiki\MediaWikiServices;
-use Title;
-//use MediaWiki\Revision\RevisionStoreFactory;
-use QueryPage;
-use RequestContext;
-use Html;
-use MWTimestamp;
+use MediaWiki\Title\Title;
+use MediaWiki\SpecialPage\QueryPage;
+use MediaWiki\Html\Html;
+use MediaWiki\Utils\MWTimestamp;
 use Ctc\Core\ctcUtils;
 
 class ctcSpecialPage extends QueryPage {
@@ -34,7 +32,7 @@ class ctcSpecialPage extends QueryPage {
 	}
 
 	function getPageHeader() {
-		$out = RequestContext::getMain()->getOutput();
+		$out = $this->getOutput();
 		$queryHeader = Html::element( 'p', null, $this->msg( 'cetei-specialpage-queryheader' )->text() );
 		$jsonStr = self::fetchExtensionJson();
 		$headerOutput = '';
