@@ -2,20 +2,15 @@
 
 namespace Ctc\Content;
 
-use CodeContentHandler;
-use Content;
-//use ContentHandler; //?
+use MediaWiki\Content\CodeContentHandler;
+use MediaWiki\Content\Content;
 use MediaWiki\Content\Renderer\ContentParseParams;
-//use MediaWiki\Content\Transform\PreSaveTransformParams;
-//use MediaWiki\Content\ValidationParams;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\MainConfigNames;
-use Html;
-use OutputPage;
-use RequestContext;
-use Title;
-//use HtmlArmor;
-use ParserOutput;
+use MediaWiki\Title\Title;
+use MediaWiki\Parser\ParserOutput;
+use MediaWiki\Html\Html;
+use MediaWiki\Context\RequestContext;
 use Ctc\Content\ctcContent;
 use Ctc\Content\ctcRender;
 use Ctc\Content\ctcSearchableContentUtils;
@@ -57,7 +52,7 @@ class ctcContentHandler extends CodeContentHandler {
 	 */
 	public function makeEmptyContent() {
 		return new ctcContent(
-			wfMessage( 'cetei-default-content' )->plain()
+			$this->requestContext->msg( 'cetei-default-content' )->plain()
 		);
 	}
 

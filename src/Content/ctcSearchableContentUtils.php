@@ -7,6 +7,7 @@
 
 namespace Ctc\Content;
 
+use Normalizer;
 use Ctc\Core\ctcUtils;
 use Ctc\Process\ctcXmlProc;
 
@@ -120,9 +121,9 @@ class ctcSearchableContentUtils {
 	 */
 	public function highlightTerm( $text, $term, $mode = "full" ): array|string|null {
 		// Normalise
-		$text = \Normalizer::normalize( $text, \Normalizer::FORM_KD );
+		$text = Normalizer::normalize( $text, Normalizer::FORM_KD );
 
-		//$term = \Normalizer::normalize( $term, \Normalizer::FORM_KD );
+		//$term = Normalizer::normalize( $term, Normalizer::FORM_KD );
 		// Uncomment to get back to the old behaviour
 		if ( substr( $term, 0, 1 ) === "\""
 			&& substr( $term, -1 ) === "\"" ) {
@@ -135,13 +136,13 @@ class ctcSearchableContentUtils {
 		// Pattern is case/accent insensitive
 		if( gettype( $term ) === "string" ) {
 			// Unused
-			$term = \Normalizer::normalize( $term, \Normalizer::FORM_KD );
+			$term = Normalizer::normalize( $term, Normalizer::FORM_KD );
 			$pattern = '/(' . preg_replace( '/\p{L}/u', '$0\p{Mn}?', preg_quote($term, '/')) . ')/ui';
 		} elseif( gettype( $term ) === "array" ) {
 			$subjects = [];
 			foreach( $term as $t ) {
 				$t = str_replace( [ "*", "<", ">" ], "", trim($t) );
-				$t = \Normalizer::normalize( $t, \Normalizer::FORM_KD );
+				$t = Normalizer::normalize( $t, Normalizer::FORM_KD );
 				// Diacriics, but see ReconciliationAPI's StringModifier for a better handler
 				$t = iconv( 'UTF-8', 'US-ASCII//TRANSLIT//IGNORE', $t );
 				$firstChar = substr( $t, 0, 1 );

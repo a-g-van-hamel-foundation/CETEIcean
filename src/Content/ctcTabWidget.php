@@ -2,11 +2,9 @@
 
 namespace Ctc\Content;
 
-//use MediaWiki\MediaWikiServices;
-//use Parser;
-use OutputPage;
-use RequestContext;
-use Html;
+use MediaWiki\Output\OutputPage;
+use MediaWiki\Context\RequestContext;
+use MediaWiki\Html\Html;
 
 /**
  * Builds the tab navigation seen in the Cetei namespace.

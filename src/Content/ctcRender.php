@@ -2,14 +2,10 @@
 
 namespace Ctc\Content;
 
-// use MediaWiki\MainConfigNames;
-use OutputPage;
-use Title;
-use RequestContext;
-use Html;
-// use MediaWiki\ParserOutput;
-// use MediaWiki\PPFrame;
-// use MediaWiki\CoreParserFunctions;
+use MediaWiki\Title\Title;
+use MediaWiki\Context\RequestContext;
+use MediaWiki\Output\OutputPage;
+use MediaWiki\Html\Html;
 use OOUI\ButtonWidget;
 use Ctc\Core\ctcUtils;
 use Ctc\Process\ctcXmlProc;

@@ -2,16 +2,7 @@
 
 namespace Ctc\Content;
 
-//use MediaWiki\MediaWikiServices;
-//use MediaWiki\MainConfigNames;
-//use MediaWiki\StatusValue;
-//use OutputPage;
-use TextContent;
-//use OOUI\IndexLayout;
-//use OOUI\PanelLayout;
-//use OOUI\TabPanelLayout;
-//use OOUI\TabSelectWidget;
-//use OOUI\TabOptionWidget;
+use MediaWiki\Content\TextContent;
 use Ctc\Content\ctcSearchableContentUtils;
 
 class ctcContent extends TextContent {
