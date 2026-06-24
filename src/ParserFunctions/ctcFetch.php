@@ -2,16 +2,13 @@
 
 namespace Ctc\ParserFunctions;
 
-use Parser;
-use PPFrame;
-use Title;
-use WikiPage;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\PPFrame;
+use MediaWiki\Title\Title;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
-use Html;
 use Ctc\ParserFunctions\ctcParserFunctionUtils;
-use Ctc\Core\ctcUtils;
-
+//use Ctc\Core\ctcUtils;
 
 class ctcFetch {
 

@@ -2,7 +2,7 @@
 
 namespace Ctc\ParserFunctions;
 
-use PPFrame;
+use MediaWiki\Parser\PPFrame;
 
 class ctcParserFunctionUtils {
 

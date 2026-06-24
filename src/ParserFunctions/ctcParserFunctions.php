@@ -6,21 +6,14 @@
 
 namespace Ctc\ParserFunctions;
 
-use Parser;
-use PPFrame;
-use RequestContext;
-use MediaWiki\MediaWikiServices;
-//use MediaWiki\MainConfigNames;
-//use OutputPage;
-//use ParserOutput;
-use Html;
-/* Required? */
-//use MediaWiki\Revision\RevisionRecord;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\PPFrame;
+use MediaWiki\Context\RequestContext;
+use MediaWiki\Html\Html;
 use Ctc\Core\ctcUtils;
 use Ctc\Content\ctcSearchableContentUtils;
 use Ctc\Process\ctcXmlProc;
 use Ctc\Process\ctcXmlExtract;
-use Ctc\ParserFunctions\ctcAlign;
 use Ctc\ParserFunctions\ctcParserFunctionUtils;
 use Ctc\ParserFunctions\ctcParserFunctionsInfo;
 use Ctc\SMW\ctcSMWStore;

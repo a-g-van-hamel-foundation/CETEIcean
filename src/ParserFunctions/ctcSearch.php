@@ -2,14 +2,10 @@
 
 namespace Ctc\ParserFunctions;
 
-use Parser;
-use PPFrame;
-//use Title;
-//use WikiPage;
-//use MediaWiki\Revision\RevisionRecord;
-use Html;
-use Ctc\ParserFunctions\ctcParserFunctionUtils;
-//use Ctc\Core\ctcUtils;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\PPFrame;
+use MediaWiki\Html\Html;
+//use Ctc\ParserFunctions\ctcParserFunctionUtils;
 
 class ctcSearch {
 

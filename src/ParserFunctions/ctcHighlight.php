@@ -6,8 +6,8 @@
 
 namespace Ctc\ParserFunctions;
 
-use Parser;
-use PPFrame;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\PPFrame;
 use Ctc\ParserFunctions\ctcParserFunctionUtils;
 use Ctc\Content\ctcSearchableContentUtils;
 

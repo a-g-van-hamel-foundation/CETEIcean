@@ -9,9 +9,9 @@
 
 namespace Ctc\ParserFunctions;
 
-use Parser;
-use PPFrame;
-use Html;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\PPFrame;
+use MediaWiki\Html\Html;
 use Ctc\Core\ctcUtils;
 use Ctc\Process\ctcXmlProc;
 use Ctc\ParserFunctions\ctcParserFunctionUtils;
