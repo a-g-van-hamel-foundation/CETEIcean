@@ -7,18 +7,15 @@
 namespace Ctc\Core;
 
 use MediaWiki\MediaWikiServices;
-//use MediaWiki\MainConfigNames;
-//use MediaWiki\OutputPage;
-//use MediaWiki\ParserOutput;
+use MediaWiki\OutputPage;
+use MediaWiki\Context\RequestContext;
+use MediaWiki\Title\Title;
+use MediaWiki\Title\TitleValue;
+//use MediaWiki\Content\ContentHandler;
+use MediaWiki\Html\Html;
+use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\Revision\RevisionRecord;
-use OutputPage;
-use RequestContext;
-use Title;
 use MediaWiki\Revision\SlotRecord;
-use WikiPage;
-use TitleValue;
-use Html;
-use ExtensionRegistry;
 use Ctc\Process\ctcXmlProc;
 
 class ctcUtils {
