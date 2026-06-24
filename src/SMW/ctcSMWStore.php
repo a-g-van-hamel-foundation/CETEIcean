@@ -8,7 +8,8 @@
 
 namespace Ctc\SMW;
 
-use Parser;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Title\Title;
 use SMW\Services\ServicesFactory;
 use SMW\DataValueFactory;
 use SMW\DIProperty;
@@ -199,7 +200,7 @@ class ctcSMWStore {
 
 	/**
 	 * Expects the 
-	 * @param \Parser $parser
+	 * @param Parser $parser
 	 * @param mixed $text - string to be chunked. Any XSLT should be done in advance.
 	 * @param mixed $title - Title that must hold semantic properties
 	 * @param mixed $propertyName - name of the property (must be datatype Text) to be used

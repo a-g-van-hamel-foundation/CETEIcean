@@ -6,7 +6,7 @@
 
 namespace Ctc\API;
 
-use ApiBase;
+use MediaWiki\Api\ApiBase;
 use Wikimedia\ParamValidator\ParamValidator;
 use MediaWiki\MediaWikiServices;
 use Ctc\SMW\ctcSMWQuery;

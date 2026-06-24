@@ -13,10 +13,8 @@
 namespace Ctc\SMW;
 
 use SMW\DIProperty;
-use SMW\DIWikiPage;
 use SMWDataItem;
 use SMWDIBlob;
-use Ctc\Process\ctcXmlProc;
 use Ctc\Content\ctcRender;
 use Ctc\Content\ctcSearchableContentUtils;
 use Ctc\Core\ctcUtils;

@@ -9,8 +9,10 @@
 
 namespace Ctc\Process;
 
-//use MediaWiki\MediaWikiServices;
-use RequestContext;
+use DOMXPath;
+use DOMDocument;
+use XSLTProcessor;
+use MediaWiki\Context\RequestContext;
 use Ctc\Content\ctcSearchableContentUtils;
 
 class ctcXmlProc {
@@ -33,7 +35,7 @@ class ctcXmlProc {
 	/**
 	 * @todo print errors to designated area
 	 * @todo maybe convert to dynamic function
-	 * @return SimpleXMLElement|bool
+	 * @return \SimpleXMLElement|bool
 	 */
 	private static function getSimpleXML( $xmlString, $nsprefix = "ctc" ) {
 		$useErrors = libxml_use_internal_errors( true );
@@ -54,7 +56,7 @@ class ctcXmlProc {
 
 	/**
 	 * Get the full SimpleXMLElement
-	 * @return SimpleXMLElement|bool
+	 * @return \SimpleXMLElement|bool
 	 */
 	public static function getFullXML( $xmlString, $nsprefix = "ctc" ) {
 		$xml = self::getSimpleXML( $xmlString, $nsprefix );
@@ -196,7 +198,7 @@ class ctcXmlProc {
 	) {
 		$domDoc->load( $this->xslPath );
 
-		$xsltProc = new \XSLTProcessor();
+		$xsltProc = new XSLTProcessor();
 		$isImported = $xsltProc->importStyleSheet( $domDoc );
 		if ( !$isImported ) {
 			return null;
@@ -216,7 +218,7 @@ class ctcXmlProc {
 	/**
 	 * Change xml:id attrs to make them unique again.
 	 * Do after simplexml_load_string( ... )
-	 * $xml SimpleXMLElement object
+	 * $xml \SimpleXMLElement object
 	 */
 	public static function changeXmlIdsOlder( $simpleXml, $nsprefix ) {
 		$xmlIdSel = "//" . $nsprefix . ":*/@xml:id";
@@ -295,7 +297,7 @@ class ctcXmlProc {
 		$newNodes = [];
 
 		// XPath
-		$xpath = new \DOMXPath( $domDoc );
+		$xpath = new DOMXPath( $domDoc );
 		$xpath->registerNamespace( $this->teiNamespacePrefix, $this->teiNamespace );
 		foreach( $tagNames as $tagName ) {
 			$nodes = $xpath->query( "//{$this->teiNamespacePrefix}:{$tagName}" );
@@ -340,11 +342,11 @@ class ctcXmlProc {
 	/**
 	 * Setup an empty DOM document, with the default stylesheet, before XSL.
 	 * No XSLPath loaded
-	 * @return \DOMDocument
+	 * @return DOMDocument
 	 */
 	private function setupEmptyDOMDocument() {
 		$allowsEntitySubst = $this->config->get( "CeteiAllowEntitySubstitution" );
-		$domDoc = new \DOMDocument();
+		$domDoc = new DOMDocument();
 		$domDoc->substituteEntities = $allowsEntitySubst; //boolean
 		$domDoc->resolveExternals = false;
 		//$loadOptions = ( $allowsEntitySubst == true ) ? LIBXML_NOENT : null;

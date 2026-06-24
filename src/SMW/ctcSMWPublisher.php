@@ -9,9 +9,7 @@
 
 namespace Ctc\SMW;
 
-use Title;
-use StoreFactory;
-use SMWQueryProcessor;
+use MediaWiki\Title\Title;
 use Ctc\SMW\ctcSMWQuery;
 
 class ctcSMWPublisher {
@@ -25,7 +23,7 @@ class ctcSMWPublisher {
 	 * Checks a given semantic property if the page is allowed
 	 * to be public. Property and possible values are set in config.
 	 * 
-	 * @param \Title $title
+	 * @param Title $title
 	 * @param mixed $smwProperty
 	 * @return bool
 	 * checkSMWFor
