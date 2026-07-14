@@ -164,7 +164,10 @@ class ctcHooks implements
 		if ( $title && $title->canExist() && $title->getNamespace() === NS_CETEI ) {			
 			$isDoc = ctcRender::isDocPage( $title );
 			if ( !$isDoc ) {
-				if ( $text instanceof HtmlArmor ) {
+				if( $text == null ) {
+					// null means default
+					$textCompared = "";
+				} else if ( $text instanceof HtmlArmor ) {
 					// this shouldn't have happened
 					$textCompared = HtmlArmor::getHtml( $text );
 				} else {
