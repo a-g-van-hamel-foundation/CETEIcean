@@ -2,7 +2,9 @@
 
 namespace Ctc\Content;
 
+use MediaWiki\Title\Title;
 use MediaWiki\Output\OutputPage;
+use MediaWiki\Context\ContextSource;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Html\Html;
 
@@ -20,8 +22,9 @@ class ctcTabWidget {
 	}
 
 	public static function run(
+		ContextSource $context,
 		OutputPage &$out,
-		$titleObj,
+		?Title $titleObj,
 		mixed $pageTitle,
 		string $ceteiInstanceDiv = "",
 		string $docBtnStr = "",
@@ -29,7 +32,7 @@ class ctcTabWidget {
 		string $sourceCode = "",
 		bool $hasTeiHeader = true
 	) {
-		$context = RequestContext::getMain();
+		//$context = RequestContext::getMain();
 
 		// Headers (text, doc, source) and top right content
 		$ctcTabName1 = $context->msg( 'cetei-tabheader-1' )->parse();
@@ -70,7 +73,7 @@ class ctcTabWidget {
 			$ctcDoc,
 			true,
 			// Do not use $out->getTitle() or $context->getTitle() = may be null
-			$titleObj
+			$titleObj ?? null
 		);
 		$out->addHTML( $ctcTabFragment2 . "</div>" );
 	}
@@ -84,7 +87,7 @@ class ctcTabWidget {
 		string $ctcTabName3,
 		string $ctcTopRight
 	): string {
-		
+
 		$ctcTabHeaders = <<<EOT
 		<div class="cetei-tab-wrapper">
 		<div class="cetei-nav-tabs">
@@ -99,7 +102,7 @@ class ctcTabWidget {
 	/**
 	 * Prepare toggle for TEI Header
 	 */
-	private static function buildBeforeHeaderContent( bool $hasTeiHeader, RequestContext $context ) {
+	private static function buildBeforeHeaderContent( bool $hasTeiHeader, ContextSource $context ) {
 		if ( $hasTeiHeader ) {
 			$ctcToggleBtn = Html::element( 'button', [
 					'id' => 'toggle-tei-header',

@@ -3,6 +3,7 @@
 namespace Ctc\Content;
 
 use MediaWiki\Title\Title;
+use MediaWiki\Context\ContextSource;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Html\Html;
@@ -21,7 +22,7 @@ class ctcRender {
 	 */
 	public static function buildPage(
 		OutputPage $outputPage,
-		RequestContext $context,
+		ContextSource $context,
 		string $retrievedText,
 		Title $titleObj,
 		mixed $teiHeaderTitle = null
@@ -59,7 +60,7 @@ class ctcRender {
 			$hasTeiHeader = false;
 		}
 		
-		$aboutSectionTemplate = RequestContext::getMain()->getConfig()->get( "CeteiAboutSectionTemplate" );
+		$aboutSectionTemplate = $context->getConfig()->get( "CeteiAboutSectionTemplate" );
 		if ( $aboutSectionTemplate !== false ) {
 			// Optionally, use designated template for 'About' section
 			$aboutSectionFromTemplate = self::letTemplateRenderAboutSection( $aboutSectionTemplate, $pageTitle, $teiHeaderTitle );
@@ -102,6 +103,7 @@ class ctcRender {
 		*/
 		$tabWidget = new ctcTabWidget();
 		$tabWidget->run(
+			$context,
 			$outputPage,
 			$titleObj,
 			$pageTitle,
@@ -148,7 +150,7 @@ class ctcRender {
 	 */
 	public static function getDocPage(
 		mixed $pageTitle,
-		RequestContext $context,
+		ContextSource $context,
 		OutputPage $outputPage
 	) {
 		$docPageTitle = $pageTitle . "/doc";
@@ -277,8 +279,14 @@ class ctcRender {
 	 * so we can assign them directly to the template.
 	 * Will perhaps depend on TemplateFunc extension
 	 */
-	private static function getSlotData( Title $titleObj ) {
-		$dataSlot = RequestContext::getMain()->getConfig()->get( "CeteiMetadataSlot" );
+	private static function getSlotData(
+		Title $titleObj,
+		$context = null
+	) {
+		if ( $context == null ) {
+			$context = RequestContext::getMain();
+		}
+		$dataSlot = $context->getConfig()->get( "CeteiMetadataSlot" );
 		if( $dataSlot !== false ) {
 			$slotContent = ctcUtils::getRawContentFromTitleObj( $titleObj, $dataSlot );
 			if ( $slotContent !== false && $slotContent !== "" ) {

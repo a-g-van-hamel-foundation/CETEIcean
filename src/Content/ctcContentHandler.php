@@ -11,6 +11,7 @@ use MediaWiki\Title\Title;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Html\Html;
 use MediaWiki\Context\RequestContext;
+use MediaWiki\Context\DerivativeContext;
 use Ctc\Content\ctcContent;
 use Ctc\Content\ctcRender;
 use Ctc\Content\ctcSearchableContentUtils;
@@ -32,7 +33,8 @@ class ctcContentHandler extends CodeContentHandler {
 		$formats = [ CONTENT_FORMAT_TEXT ]
 	) {
 		parent::__construct( $modelId, $formats );
-		$this->requestContext = RequestContext::getMain();
+		//$newContext = new DerivativeContext( $currentContext );
+		$this->requestContext = new DerivativeContext( RequestContext::getMain() );
 		$this->services = MediaWikiServices::getInstance();
 		$this->config = $this->services->getMainConfig();
 	}
