@@ -8,6 +8,8 @@
 namespace Ctc\Content;
 
 use Normalizer;
+use SearchDatabase;
+use MediaWiki\MediaWikiServices;
 use Ctc\Core\ctcUtils;
 use Ctc\Process\ctcXmlProc;
 
@@ -92,7 +94,7 @@ class ctcSearchableContentUtils {
 		$attrVals = implode( " | ", $attrValsArr );
 
 		// Handle notes separately
-		[ $newXml, $extractedTags ] = $this->removeTags( $xmlStr, [ "note" ] );
+		[ $newXml, $extractedTags ] = $ctcXmlProc->removeTags( $xmlStr, [ "note" ] );
 		$extractedTagsDoc = $ctcXmlProc->createDocumentStringForExtracts( $extractedTags );
 
 		// The text itself, with entities
@@ -214,14 +216,14 @@ class ctcSearchableContentUtils {
 	 * @return array|string|null
 	 */
 	public function normalizeText( $string ) {
-		$out = \SearchDatabase::normalizeText( $string );
+		$out = SearchDatabase::normalizeText( $string );
 
 		// MySQL fulltext index doesn't grok utf-8, so we
 		// need to fold cases and convert to hex
 		$out = preg_replace_callback(
 			"/([\\xc0-\\xff][\\x80-\\xbf]*)/",
 			[ $this, 'stripForSearchCallback' ],
-			\MediaWikiServices::getInstance()->getContentLanguage()->lc( $out ) );
+			MediaWikiServices::getInstance()->getContentLanguage()->lc( $out ) );
 
 		// And to add insult to injury, the default indexing
 		// ignores short words... Pad them so we can pass them
