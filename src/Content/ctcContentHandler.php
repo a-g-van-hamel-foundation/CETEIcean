@@ -89,7 +89,7 @@ class ctcContentHandler extends CodeContentHandler {
 		//checks
 		$generateHtml = $cpoParams->getGenerateHtml(); // true or false
 		if ( $generateHtml == false ) {
-			$parserOutput->setText( "..." );
+			$parserOutput->setRawText( "..." );
 			// @todo insert error messsage here
 			return;
 		}
@@ -132,12 +132,12 @@ class ctcContentHandler extends CodeContentHandler {
 			$outputPage,
 			$this->requestContext,
 			$freshContent,
-			$title, //same as $out->getTitle(),
+			$title,
 			$displayTitle
 		);
 
 		$parserOutput->clearWrapperDivClass();
-		$parserOutput->setText( "" );
+		$parserOutput->setRawText( "" );
 	}
 
 	/**
@@ -148,7 +148,7 @@ class ctcContentHandler extends CodeContentHandler {
 	private static function checkContentStatus( ParserOutput &$parserOutput, $content ) {
 		if ( $content->isValid() === false ) {
 			$el = Html::rawElement( 'div', [ 'class' => 'error' ], "" );
-			$parserOutput->setText( $el );
+			$parserOutput->setRawText( $el );
 			return;
 		}
 	}
