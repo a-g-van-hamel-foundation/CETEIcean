@@ -8,7 +8,6 @@
 namespace Ctc\Content;
 
 use Normalizer;
-use SearchDatabase;
 use MediaWiki\MediaWikiServices;
 use Ctc\Core\ctcUtils;
 use Ctc\Process\ctcXmlProc;
@@ -210,43 +209,14 @@ class ctcSearchableContentUtils {
 	}
 
 	/**
-	 * Borrowed from MediaWiki's SearchMySQL
+	 * Database normalisation of text.
 	 * 
 	 * @param mixed $string
 	 * @return array|string|null
 	 */
 	public function normalizeText( $string ) {
-		$out = SearchDatabase::normalizeText( $string );
-
-		// MySQL fulltext index doesn't grok utf-8, so we
-		// need to fold cases and convert to hex
-		$out = preg_replace_callback(
-			"/([\\xc0-\\xff][\\x80-\\xbf]*)/",
-			[ $this, 'stripForSearchCallback' ],
-			MediaWikiServices::getInstance()->getContentLanguage()->lc( $out ) );
-
-		// And to add insult to injury, the default indexing
-		// ignores short words... Pad them so we can pass them
-		// through without reconfiguring the server...
-		$minLength = $this->minSearchLength();
-		if ( $minLength > 1 ) {
-			$n = $minLength - 1;
-			$out = preg_replace(
-				"/\b(\w{1,$n})\b/",
-				"$1u800",
-				$out );
-		}
-
-		// Periods within things like hostnames and IP addresses
-		// are also important -- we want a search for "example.com"
-		// or "192.168.1.1" to work sensibly.
-		// MySQL's search seems to ignore them, so you'd match on
-		// "example.wikipedia.com" and "192.168.83.1" as well.
-		return preg_replace(
-			"/(\w)\.(\w|\*)/u",
-			"$1u82e$2",
-			$out
-		);
+		$searchEngine = MediaWikiServices::getInstance()->getSearchEngine();
+		return $searchEngine->normalizeText( $string );
 	}
 
 	private function stripForSearchCallback( $matches ) {
