@@ -6,6 +6,7 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\PPFrame;
 use MediaWiki\Title\Title;
 use MediaWiki\Context\RequestContext;
+use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Config\Config;
@@ -159,7 +160,7 @@ class ctcHooks implements
 	 */
 	public function onHtmlPageLinkRendererBegin( $linkRenderer, $linkTarget, &$text, &$customAttribs, &$query, &$ret ) {
 		// Only if namespace = Cetei and not a /doc subpage
-		$requestContext = RequestContext::getMain();
+		$requestContext = new DerivativeContext( RequestContext::getMain() );
 		$title = $requestContext->getTitle();
 		if ( $title && $title->canExist() && $title->getNamespace() === NS_CETEI ) {			
 			$isDoc = ctcRender::isDocPage( $title );
