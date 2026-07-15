@@ -45,7 +45,7 @@ class ctcAPISearch extends ApiBase {
 
 		// Buld query syntax
 		$smwContentProperty = $this->smwContentProperty;
-		if ( $this->smwPublicationProperty !== false && ! ctcUtils::isUser() ) {
+		if ( $this->smwPublicationProperty !== false && ! ctcUtils::isUser( $this->getContext() ) ) {
 			// Search 'public' only
 			$rawQuery = "[[Cetei:+]] [[{$smwContentProperty}::~{$prefix}]] [[-Has subobject.{$this->smwPublicationProperty}::{$this->smwPublicLabel}]]";
 			// example: [[Cetei:+]] [[Searchstring::+]] [[-Has subobject.Is published::Yes]]			

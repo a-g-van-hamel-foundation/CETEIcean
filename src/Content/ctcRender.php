@@ -84,7 +84,7 @@ class ctcRender {
 			$isPublic = false;
 		}
 
-		if( !ctcUtils::isUser() && !$isPublic ) {
+		if( !ctcUtils::isUser( $context ) && !$isPublic ) {
 			$notPublicMsg = "<div class='cetei-alert'>" . $context->msg( "cetei-not-public" )->parse() . "</div>";
 			$outputPage->addWikiTextAsContent(
 				// @dev - we still need section to render, or we'll lose properties
@@ -158,7 +158,7 @@ class ctcRender {
 			$docAddMsg = $context->msg( "cetei-edit-documentation" )->parse();
 			//$linkDocUrl = Title::newFromText( $docPageTitle )->getFullURL( 'action=edit' );
 			$linkDocUrl = $context->msg( "cetei-edit-documentation-url" )->params( $docPageTitle )->text();
-			if ( ctcUtils::isUser() ) {
+			if ( ctcUtils::isUser( $context ) ) {
 				$docBtnStr = self::createButtonWidget( $outputPage, $docAddMsg, $linkDocUrl, 'edit', null );
 			} else {
 				 //default
@@ -168,7 +168,7 @@ class ctcRender {
 		} else {
 			// defaults
 			$docBtnStr = $docPageStr = "";
-			if ( ctcUtils::isUser() ) {
+			if ( ctcUtils::isUser( $context ) ) {
 				//$linkDocUrl = Title::newFromText( $docPageTitle )->getFullURL( 'action=edit' );
 				$linkDocUrl = $context->msg( "cetei-edit-documentation-url" )->params( $docPageTitle )->text();
 				$docAddMsg = $context->msg( "cetei-add-documentation" )->parse();
@@ -264,13 +264,6 @@ class ctcRender {
 		] );
 
 		return $btn;
-	}
-
-	/**
-	 * @deprecated. Moved to ctcUtils.
-	*/
-	private static function isUser() {
-		return ctcUtils::isUser();
 	}
 
 	/**
