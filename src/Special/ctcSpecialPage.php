@@ -65,6 +65,8 @@ class ctcSpecialPage extends QueryPage {
 		}
 		$headerOutput .= '<h2>Documents</h2><div class="cetei-specialpage-queryheader">' . $queryHeader . '</div>';
 
+		$this->getOutput()->addModules( [ "ext.ctc.styles" ] );
+
 		$out->addWikiTextAsContent( $headerOutput );
 	}
 
